@@ -51,7 +51,7 @@ namespace Imperium.Commands
             string name = player.Name;
 
             foreach(Players.Player plr in empire.GetConnectedPlayers())
-                Chatting.Chat.Send(plr, string.Format("<color=yellow>[{0}]: {1}</color>", name, chat));
+                Chatting.Chat.Send(plr, string.Format("<color=yellow>[{0}][{1}]: {2}</color>", empire.GetRank(player).ToString(), name, chat));
 
             return true;
         }
