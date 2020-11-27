@@ -310,7 +310,7 @@ namespace Imperium
             menu.Items.Add(new NetworkUI.Items.InputField("EmpireName"));
 
             menu.LocalStorage.SetAs("AutomaticRequest", empire.automaticRequest);
-            menu.Items.Add(new NetworkUI.Items.Toggle("Automatically accept joning request to the empire", "AutomaticRequest"));
+            menu.Items.Add(new NetworkUI.Items.Toggle("Automatically accept joining request to the empire", "AutomaticRequest"));
 
             menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetSettings_NOTHING", new LabelData("Save", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
 
