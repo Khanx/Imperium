@@ -154,7 +154,6 @@ namespace Imperium
             {
                 menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_BackPermission_NOTHING", new LabelData("Set Permissions", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
                 menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SettingsMenu_NOTHING", new LabelData("Settings", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
-
             }
 
 
@@ -179,7 +178,7 @@ namespace Imperium
                 members.Add((new NetworkUI.Items.Label(plr.Name), 250));
                 members.Add((new NetworkUI.Items.Label(empire.GetRank(plr).ToString()), 125));
 
-                if ((empire.CanPermission(player, Permissions.Ranks) || empire.CanPermission(player, Permissions.Kick)) && (empire.GetRank(player) < empire.GetRank(plr) || empire.GetRank(player) == Rank.Emperor))
+                if ((empire.CanPermission(player, Permissions.Ranks) || empire.CanPermission(player, Permissions.Kick)) && (empire.GetRank(player) < empire.GetRank(plr) || empire.GetRank(player) == Rank.Emperor) && !player.ID.Equals(plr.ID))
                     members.Add((new NetworkUI.Items.ButtonCallback("Empire_Manage_" + plr.Name, new LabelData("Manage", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 125));
                 else
                     members.Add((new NetworkUI.Items.EmptySpace(), 125));
