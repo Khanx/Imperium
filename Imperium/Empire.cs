@@ -251,9 +251,9 @@ namespace Imperium
                 return;
             }
 
-            if(name.Length < 4 || name.Length > 15)
+            if(name.Length < 4 || name.Length > 50)
             {
-                Chatting.Chat.Send(player, "<color=orange>The name of your empire needs to have between 4 and 15 characters.</color>");
+                Chatting.Chat.Send(player, "<color=orange>The name of your empire needs to have between 4 and 50 characters.</color>");
                 return;
             }
 
