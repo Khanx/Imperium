@@ -526,8 +526,13 @@ namespace Imperium
 
                     case "SetSettings":
                     {
-                        empire.SetEmpireName(data.Storage.GetAs<string>("EmpireName"), data.Player);
-                        empire.SetAutomaticRequest(data.Storage.GetAs<bool>("AutomaticRequest"), data.Player);
+                        string newName = data.Storage.GetAs<string>("EmpireName");
+                        if(!empire.name.Equals(newName))
+                            empire.SetEmpireName(newName, data.Player);
+
+                        bool automaticRequest = data.Storage.GetAs<bool>("AutomaticRequest");
+                        if (empire.automaticRequest != automaticRequest)
+                            empire.SetAutomaticRequest(automaticRequest, data.Player);
                     }
                     break;
                 }
