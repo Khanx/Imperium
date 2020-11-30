@@ -272,7 +272,7 @@ namespace Imperium
                 }
 
                 //You can PROMOTE anyone with LOWER rank than you BUT you cannot promote to your rank
-                if (!empire.CanPermission(p1_rank, Permissions.Ranks) || (p2_rank - p1_rank > 1 && p1_rank != Rank.Emperor))
+                if (!empire.CanPermission(p1_rank, Permissions.Ranks) || (p2_rank == Rank.Emperor) || (p1_rank!=Rank.Emperor && p1_rank >= p2_rank-1))
                 {
                     b_Promote.Enabled = false;
                 }
