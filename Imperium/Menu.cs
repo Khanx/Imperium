@@ -12,19 +12,20 @@ namespace Imperium
 
             NetworkMenu menu = new NetworkMenu();
             menu.LocalStorage.SetAs("header", "Empires");
-            menu.Width = 500;
+            menu.Width = 550;
 
 
             if (!belongEmpire)
                 menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_NewEmpire_NOTHING", new LabelData("Found a new empire", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
 
-            var table = new NetworkUI.Items.Table(500, 180);
+            var table = new NetworkUI.Items.Table(550, 180);
             table.ExternalMarginHorizontal = 0f;
             {
                 var headerRow = new NetworkUI.Items.HorizontalRow(new List<(IItem, int)>()
                 {
                     (new NetworkUI.Items.Label("Empire"), 250),
-                     (new NetworkUI.Items.Label("Action"), 250)
+                     (new NetworkUI.Items.Label("Action"), 150),
+                     (new NetworkUI.Items.Label("Members"), 100)
                 });
                 var headerBG = new NetworkUI.Items.BackgroundColor(headerRow, height: -1, color: NetworkUI.Items.Table.HEADER_COLOR);
                 table.Header = headerBG;
@@ -37,9 +38,11 @@ namespace Imperium
                 emp.Add((new NetworkUI.Items.Label(empire.name), 250));
 
                 if (!belongEmpire && !empire.joinRequest.Contains(player.ID))
-                    emp.Add((new NetworkUI.Items.ButtonCallback("Empire_Apply_" + empire.name, new LabelData("Apply", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 250));
+                    emp.Add((new NetworkUI.Items.ButtonCallback("Empire_Apply_" + empire.name, new LabelData("Apply", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 150));
                 else
-                    emp.Add((new NetworkUI.Items.EmptySpace(), 250));
+                    emp.Add((new NetworkUI.Items.EmptySpace(), 150));
+
+                emp.Add((new NetworkUI.Items.Label(new LabelData(empire.GetPlayers().Count.ToString(), UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 100));
 
                 table.Rows.Add(new NetworkUI.Items.HorizontalRow(emp));
             }
