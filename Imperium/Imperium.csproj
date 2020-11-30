@@ -69,6 +69,7 @@
     <Compile Include="Commands\Disband.cs" />
     <Compile Include="Commands\Empire.cs" />
     <Compile Include="Commands\Empires.cs" />
+    <Compile Include="Commands\Belong.cs" />
     <Compile Include="Commands\Leave.cs" />
     <Compile Include="Empire.cs" />
     <Compile Include="Menu.cs" />

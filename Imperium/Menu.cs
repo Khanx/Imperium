@@ -42,7 +42,7 @@ namespace Imperium
                 else
                     emp.Add((new NetworkUI.Items.EmptySpace(), 150));
 
-                emp.Add((new NetworkUI.Items.Label(new LabelData(empire.GetPlayers().Count.ToString(), UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 100));
+                emp.Add((new NetworkUI.Items.Label(empire.GetPlayers().Count.ToString()), 100));
 
                 table.Rows.Add(new NetworkUI.Items.HorizontalRow(emp));
             }
@@ -208,6 +208,7 @@ namespace Imperium
 
             menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/empire - Show information about your current empire", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleLeft, 20)));
             menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/empires - Show information about ALL the empires", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleLeft, 20)));
+            menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/belong_empire - Show the affiliation of each connected player", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleLeft, 20)));
 
             menu.Items.Add(new NetworkUI.Items.EmptySpace(15));
 
@@ -380,6 +381,57 @@ namespace Imperium
 
             NetworkMenuManager.SendServerPopup(player, menu);
         }
+
+
+        public static void SendMenuBelong(Players.Player player)
+        {
+            NetworkMenu menu = new NetworkMenu();
+            menu.LocalStorage.SetAs("header", "Empire belong");
+            menu.Width = 550;
+
+            var table = new NetworkUI.Items.Table(700, 180);
+            table.ExternalMarginHorizontal = 0f;
+            {
+                var headerRow = new NetworkUI.Items.HorizontalRow(new List<(IItem, int)>()
+                {
+                    (new NetworkUI.Items.Label("Player"), 250),
+                     (new NetworkUI.Items.Label("Empire"), 250),
+                     (new NetworkUI.Items.Label("Rank"), 125)
+                });
+                var headerBG = new NetworkUI.Items.BackgroundColor(headerRow, height: -1, color: NetworkUI.Items.Table.HEADER_COLOR);
+                table.Header = headerBG;
+            }
+            table.Rows = new List<IItem>();
+
+            for(int i = 0; i < Players.CountConnected;i++)
+            {
+                Players.Player plr = Players.GetConnectedByIndex(i);
+
+                List<(IItem, int)> emp = new List<(IItem, int)>();
+
+                emp.Add((new NetworkUI.Items.Label(plr.Name), 250));
+
+                Empire empire = Empire.GetEmpire(player);
+
+                if (empire != null)
+                {
+                    emp.Add((new NetworkUI.Items.Label(empire.name), 250));
+                    emp.Add((new NetworkUI.Items.Label(empire.GetRank(plr).ToString()), 250));
+                }
+                else
+                {
+                    emp.Add((new NetworkUI.Items.Label("-"), 250));
+                    emp.Add((new NetworkUI.Items.Label("-"), 250));
+                }
+
+                table.Rows.Add(new NetworkUI.Items.HorizontalRow(emp));
+            }
+
+            menu.Items.Add(table);
+
+            NetworkMenuManager.SendServerPopup(player, menu);
+        }
+
 
         [ModLoader.ModCallback(ModLoader.EModCallbackType.OnPlayerPushedNetworkUIButton, "Khanx.Imperium.PressButton")]
         public static void EmpireButtonManager(ButtonPressCallbackData data)
