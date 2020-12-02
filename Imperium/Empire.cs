@@ -383,6 +383,9 @@ namespace Imperium
 
             members.Add(player.ID, Rank.Lord);
             Chatting.Chat.Send(player, string.Format("<color=green>{0} has accepted your request of joining.</color>", name));
+
+            if (joinRequest.Contains(player.ID))
+                joinRequest.Remove(player.ID);
         }
 
         public void Invite(Players.Player player)
