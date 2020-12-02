@@ -536,7 +536,10 @@ namespace Imperium
                             if (null != empire)
                                 empire.Invite(plr, data.Player);
 
-                        SendMenuEmpireRequest(data.Player);
+                        if (empire.joinRequest.Count > 0)
+                            SendMenuEmpireRequest(data.Player);
+                        else
+                            SendMenuEmpire(data.Player);
                     }
                     break;
 
@@ -551,7 +554,10 @@ namespace Imperium
                                     Chatting.Chat.Send(plr, string.Format("<color=green>{0} has rejected your request of joining.</color>", empire.name));
                                 }
 
-                        SendMenuEmpireRequest(data.Player);
+                        if (empire.joinRequest.Count > 0)
+                            SendMenuEmpireRequest(data.Player);
+                        else
+                            SendMenuEmpire(data.Player);
                     }
                     break;
 
