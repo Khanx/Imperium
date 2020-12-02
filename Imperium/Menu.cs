@@ -81,10 +81,10 @@ namespace Imperium
                 return;
 
             NetworkMenu menu = new NetworkMenu();
-            menu.Width = 600;
+            menu.Width = 550;
             menu.LocalStorage.SetAs("header", "Join Request");
 
-            var table = new NetworkUI.Items.Table(500, 180);
+            var table = new NetworkUI.Items.Table(550, 180);
             table.ExternalMarginHorizontal = 0f;
             {
                 var headerRow = new NetworkUI.Items.HorizontalRow(new List<(IItem, int)>()
@@ -387,7 +387,7 @@ namespace Imperium
         {
             NetworkMenu menu = new NetworkMenu();
             menu.LocalStorage.SetAs("header", "Empire belong");
-            menu.Width = 550;
+            menu.Width = 700;
 
             var table = new NetworkUI.Items.Table(700, 180);
             table.ExternalMarginHorizontal = 0f;
@@ -411,7 +411,7 @@ namespace Imperium
 
                 emp.Add((new NetworkUI.Items.Label(plr.Name), 250));
 
-                Empire empire = Empire.GetEmpire(player);
+                Empire empire = Empire.GetEmpire(plr);
 
                 if (empire != null)
                 {
