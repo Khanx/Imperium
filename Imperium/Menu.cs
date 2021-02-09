@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using NetworkUI;
+using System.Linq;
 
 namespace Imperium
 {
@@ -32,7 +33,9 @@ namespace Imperium
             }
             table.Rows = new List<IItem>();
 
-            foreach (Empire empire in Empire.empires)
+            var orderedEmpire = from empire in Empire.empires orderby empire.GetPlayers().Count() descending select empire;
+
+            foreach (Empire empire in orderedEmpire)
             {
                 List<(IItem, int)> emp = new List<(IItem, int)>();
                 emp.Add((new NetworkUI.Items.Label(empire.name), 250));
