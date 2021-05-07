@@ -7,6 +7,8 @@ namespace Imperium
     [ModLoader.ModManager]
     public static class EmpireMenu
     {
+        public static readonly int maxMembers = 20;
+
         public static void SendMenuEmpireList(Players.Player player)
         {
             bool belongEmpire = null != Empire.GetEmpire(player);
@@ -40,12 +42,12 @@ namespace Imperium
                 List<(IItem, int)> emp = new List<(IItem, int)>();
                 emp.Add((new NetworkUI.Items.Label(empire.name), 250));
 
-                if (!belongEmpire && !empire.joinRequest.Contains(player.ID))
+                if (!belongEmpire && !empire.joinRequest.Contains(player.ID) && empire.GetPlayers().Count <= maxMembers)
                     emp.Add((new NetworkUI.Items.ButtonCallback("Empire_Apply_" + empire.name, new LabelData("Apply", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 150));
                 else
-                    emp.Add((new NetworkUI.Items.EmptySpace(), 150));
+                    emp.Add((new NetworkUI.Items.ButtonCallback("Empire_Apply_" + empire.name, new LabelData("Apply", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), isInteractive: false), 150));
 
-                emp.Add((new NetworkUI.Items.Label(empire.GetPlayers().Count.ToString()), 100));
+                emp.Add((new NetworkUI.Items.Label(empire.GetPlayers().Count.ToString() + "/" + maxMembers), 100));
 
                 table.Rows.Add(new NetworkUI.Items.HorizontalRow(emp));
             }
@@ -114,7 +116,10 @@ namespace Imperium
                 }
 
                 requests.Add((new NetworkUI.Items.Label(plr.Name), 250));
-                requests.Add((new NetworkUI.Items.ButtonCallback("Empire_AcceptRequest_" + plr.Name, new LabelData("Accept", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 125));
+                if(empire.GetPlayers().Count < maxMembers)
+                    requests.Add((new NetworkUI.Items.ButtonCallback("Empire_AcceptRequest_" + plr.Name, new LabelData("Accept", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 125));
+                else
+                    requests.Add((new NetworkUI.Items.ButtonCallback("Empire_AcceptRequest_" + plr.Name, new LabelData("Accept", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), isInteractive: false), 125));
                 requests.Add((new NetworkUI.Items.ButtonCallback("Empire_RejectRequest_" + plr.Name, new LabelData("Reject", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 125));
 
                 table.Rows.Add(new NetworkUI.Items.HorizontalRow(requests));
