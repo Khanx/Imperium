@@ -7,7 +7,7 @@ namespace Imperium.Commands
     [ChatCommandAutoLoader]
     public class AutomaticChat : IChatCommand
     {
-        public List<Players.Player> activeTeamChat { get; } = new List<Players.Player>();
+        public static List<Players.Player> activeTeamChat { get; } = new List<Players.Player>();
 
         public bool TryDoCommand(Players.Player player, string chat, List<string> splits)
         {
@@ -37,21 +37,26 @@ namespace Imperium.Commands
                     return true;
                 }
             }
-
-            if(activeTeamChat.Contains(player) && empire == null)
+            
+            if (chat.StartsWith("/"))
+                return false;
+            
+            if (activeTeamChat.Contains(player) && empire == null)
             {
                 activeTeamChat.Remove(player);
 
                 return false;
             }
 
-            if(chat.StartsWith("/") || !activeTeamChat.Contains(player))
-                return false;
+            if(!activeTeamChat.Contains(player) && empire != null && !empire.tag.Equals(""))
+            {
+                Chatting.Chat.SendToConnected(string.Format("{0}[<color=green>{1}</color>]: {2}", player.Name, empire.tag, chat));
 
-            string name = player.Name;
-
-            foreach(Players.Player plr in empire.GetConnectedPlayers())
-                Chatting.Chat.Send(plr, string.Format("<color=yellow>[{0}][{1}]: {2}</color>", empire.GetRank(player).ToString(), name, chat));
+                return true;
+            }
+            
+            foreach (Players.Player plr in empire.GetConnectedPlayers())
+                Chatting.Chat.Send(plr, string.Format("<color=yellow>[{0}][{1}]: {2}</color>", empire.GetRank(player).ToString(), player.Name, chat));
 
             return true;
         }

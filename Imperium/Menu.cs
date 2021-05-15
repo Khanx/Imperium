@@ -67,6 +67,10 @@ namespace Imperium
 
             menu.Items.Add(new NetworkUI.Items.Label("Empire Name"));
             menu.Items.Add(new NetworkUI.Items.InputField("EmpireName"));
+
+            menu.Items.Add(new NetworkUI.Items.Label("Empire Tag"));
+            menu.Items.Add(new NetworkUI.Items.InputField("EmpireTag"));
+
             menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_FoundEmpire_NOTHING", new LabelData("Create empire", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
 
             NetworkMenuManager.SendServerPopup(player, menu);
@@ -317,9 +321,12 @@ namespace Imperium
             menu.Width = 500;
 
             menu.Items.Add(new NetworkUI.Items.Label("Empire Name"));
-
             menu.LocalStorage.SetAs("EmpireName", empire.name);
             menu.Items.Add(new NetworkUI.Items.InputField("EmpireName"));
+
+            menu.Items.Add(new NetworkUI.Items.Label("Empire Tag"));
+            menu.LocalStorage.SetAs("EmpireTag", empire.tag);
+            menu.Items.Add(new NetworkUI.Items.InputField("EmpireTag"));
 
             menu.LocalStorage.SetAs("AutomaticRequest", empire.automaticRequest);
             menu.Items.Add(new NetworkUI.Items.Toggle("Automatically accept joining request to the empire", "AutomaticRequest"));
@@ -571,7 +578,7 @@ namespace Imperium
 
                     case "FoundEmpire":
                     {
-                            Empire.CreateEmpire(data.Storage.GetAs<string>("EmpireName"), data.Player);
+                            Empire.CreateEmpire(data.Storage.GetAs<string>("EmpireName"), data.Storage.GetAs<string>("EmpireTag"), data.Player);
                     }
                     break;
 
@@ -598,6 +605,10 @@ namespace Imperium
                         string newName = data.Storage.GetAs<string>("EmpireName");
                         if(!empire.name.Equals(newName))
                             empire.SetEmpireName(newName, data.Player);
+
+                        string newTag = data.Storage.GetAs<string>("EmpireTag");
+                        if (!empire.tag.Equals(newTag))
+                            empire.SetEmpireTag(newTag, data.Player);
 
                         bool automaticRequest = data.Storage.GetAs<bool>("AutomaticRequest");
                         if (empire.automaticRequest != automaticRequest)

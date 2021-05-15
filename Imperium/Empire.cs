@@ -60,6 +60,7 @@ namespace Imperium
         public static List<Empire> empires = new List<Empire>();
 
         public string name { get; internal set; } = "";
+        public string tag { get; internal set; } = "";
         //public string announcement { get; internal set; } = "Test Announcement";
 
         public readonly List<NetworkID> joinRequest = new List<NetworkID>();         //People who has requested to join the empire but have not accepted / rejected
@@ -105,7 +106,7 @@ namespace Imperium
             return GetEmpire(name) != null;
         }
 
-        public static bool CreateEmpire(string name, Players.Player emperor)
+        public static bool CreateEmpire(string name, string tag, Players.Player emperor)
         {
             if(null != GetEmpire(emperor))
             {
@@ -113,7 +114,9 @@ namespace Imperium
                 return false;
             }
 
-            if(name.Length < 4 || name.Length > 50)
+            name = name.Trim();
+            
+            if (name.Length < 4 || name.Length > 50)
             {
                 Chatting.Chat.Send(emperor, "<color=orange>The name of your empire needs to have between 4 and 50 characters.</color>");
                 return false;
@@ -125,6 +128,14 @@ namespace Imperium
             {
                 Chatting.Chat.Send(emperor, "<color=orange>There is already an empire with that name.</color>");
                 return true;
+            }
+
+            tag = tag.ToUpper().Trim();
+
+            if(tag.Length <3 || tag.Length > 4)
+            {
+                Chatting.Chat.Send(emperor, "<color=orange>The tag of your empire needs to have between 3 and 4 characters.</color>");
+                return false;
             }
 
             new Empire(name, emperor);
@@ -251,16 +262,47 @@ namespace Imperium
                 return;
             }
 
+            name = name.Trim();
+
             if(name.Length < 4 || name.Length > 50)
             {
                 Chatting.Chat.Send(player, "<color=orange>The name of your empire needs to have between 4 and 50 characters.</color>");
                 return;
             }
 
-            this.name = name;
+            this.name = char.ToUpper(name[0]) + name.Substring(1);
 
-            string message = string.Format("<color=yellow>{0} is the new name of the empire.</color>", name);
+            string message = string.Format("<color=yellow>{0} is the new name of the empire.</color>", this.name);
             foreach(Players.Player plr in GetConnectedPlayers())
+                Chatting.Chat.Send(plr, message);
+        }
+
+        public void SetEmpireTag(string tag, Players.Player player)
+        {
+            if (!members.ContainsKey(player.ID))
+            {
+                Chatting.Chat.Send(player, "<color=orange>You do not belong to any empire.</color>");
+                return;
+            }
+
+            if (Rank.Emperor != GetRank(player))
+            {
+                Chatting.Chat.Send(player, "<color=orange>Only the emperor can change the name of the empire.</color>");
+                return;
+            }
+
+            tag = tag.Trim();
+
+            if (tag.Length < 3 || tag.Length > 4)
+            {
+                Chatting.Chat.Send(player, "<color=orange>The tag of your empire needs to have between 3 and 4 characters.</color>");
+                return;
+            }
+
+            this.tag = tag.ToUpper();
+
+            string message = string.Format("<color=yellow>{0} is the new tag of the empire.</color>", this.tag);
+            foreach (Players.Player plr in GetConnectedPlayers())
                 Chatting.Chat.Send(plr, message);
         }
 
@@ -563,6 +605,8 @@ namespace Imperium
         public Empire(JSONNode json)
         {
             name = json.GetAs<string>("Name");
+            tag = json.GetAsOrDefault<string>("Tag", "");
+
             //announcement = json.GetAs<string>("Announcement");
             automaticRequest = json.GetAs<bool>("automaticRequest");
 
@@ -609,6 +653,7 @@ namespace Imperium
         {
             JSONNode json = new JSONNode();
             json.SetAs<string>("Name", name);
+            json.SetAs<string>("Tag", tag);
             //json.SetAs<string>("Announcement", announcement);
             json.SetAs<bool>("automaticRequest", automaticRequest);
 
