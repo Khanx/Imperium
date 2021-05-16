@@ -225,8 +225,8 @@ namespace Imperium
             menu.Items.Add(new NetworkUI.Items.EmptySpace(15));
 
             menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/ce <message> - Sends the <message> only to the members of the empire", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleLeft, 20)));
-            //There is a conflict with the ColonyCommands mod
-            //menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/chat_empire - Enable / Disable send all the messages only to empire's members", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter, 20)));
+            //The conflict of the ColonyCommandsMod has been resolved
+            menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/chat_empire - Enable / Disable send all the messages only to empire's members", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter, 20)));
 
             menu.Items.Add(new NetworkUI.Items.EmptySpace(15));
 

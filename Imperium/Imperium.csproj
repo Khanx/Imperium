@@ -64,6 +64,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Imperium.cs" />
     <Compile Include="Commands\AutomaticChat.cs" />
     <Compile Include="Commands\Chat.cs" />
     <Compile Include="Commands\Disband.cs" />

@@ -132,9 +132,9 @@ namespace Imperium
 
             tag = tag.ToUpper().Trim();
 
-            if(tag.Length <3 || tag.Length > 4)
+            if(tag.Length > 4)
             {
-                Chatting.Chat.Send(emperor, "<color=orange>The tag of your empire needs to have between 3 and 4 characters.</color>");
+                Chatting.Chat.Send(emperor, "<color=orange>The tag of your empire must be less than 5 characters.</color>");
                 return false;
             }
 
@@ -293,9 +293,9 @@ namespace Imperium
 
             tag = tag.Trim();
 
-            if (tag.Length < 3 || tag.Length > 4)
+            if (tag.Length > 4)
             {
-                Chatting.Chat.Send(player, "<color=orange>The tag of your empire needs to have between 3 and 4 characters.</color>");
+                Chatting.Chat.Send(player, "<color=orange>The tag of your empire must be less than 5 characters.</color>");
                 return;
             }
 
