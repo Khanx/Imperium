@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Linq;
 using Pipliz;
 using Pipliz.JSON;
 
@@ -61,6 +61,7 @@ namespace Imperium
 
         public string name { get; internal set; } = "";
         public string tag { get; internal set; } = "";
+        public static readonly string[] NoTag = { "ANAL", "ANUS", "ARSE", "ASS", "BOOB", "BUM", "BUTT", "CAWK", "CIPA", "CLIT", "CNUT", "COCK", "COK", "COON", "COX", "CRAP", "CUM", "CUMS", "CUNT", "DAMN", "DICK", "DINK", "DLCK", "DYKE", "FAG", "FAGS", "FCUK", "FECK", "FOOK", "FUCK", "FUK", "FUKS", "FUX", "HELL", "HOAR", "HOER", "HOMO", "HORE", "JAP", "JISM", "JIZ", "JIZM", "JIZZ", "KAWK", "KNOB", "KOCK", "KUM", "KUMS", "LUST", "MOFO", "MUFF", "NAZI", "NOB", "PAWN", "PHUK", "PHUQ", "PISS", "POOP", "PORN", "PRON", "PUBE", "SEX", "SHAG", "SHIT", "SLUT", "SMUT", "SPAC", "TEEZ", "TIT", "TITS", "TITT", "TURD", "TWAT", "WANG", "WANK", "XXX", "DAGO", "DIKE", "GAY", "GOOK", "HEEB", "HO", "HOE", "KIKE", "KUNT", "KYKE", "MICK", "PAKI", "POON", "PUTO", "SHIZ", "SMEG", "SPIC", "TARD", "VAG", "WOP", "FOAH", "PUST", "SEKS", "SLAG", "ZUBB", "BBW", "BDSM", "DVDA", "GURO", "MILF", "NUDE", "ORGY", "POOF", "PTHC", "QUIM", "RAPE", "SCAT", "SEXO", "SEXY", "SUCK", "SMUT", "YURI", "YAOI", "XX", "XXX", "XXXX" };
         //public string announcement { get; internal set; } = "Test Announcement";
 
         public readonly List<NetworkID> joinRequest = new List<NetworkID>();         //People who has requested to join the empire but have not accepted / rejected
@@ -106,6 +107,27 @@ namespace Imperium
             return GetEmpire(name) != null;
         }
 
+        public static bool TagUsed(string tag)
+        {
+            tag = tag.ToUpper().Trim();
+
+            foreach (Empire empire in empires)
+                if (empire.tag.Equals(tag))
+                    return true;
+            return false;
+        }
+
+        public static bool AllowedTag(string tag)
+        {
+            tag = tag.ToUpper().Trim();
+
+            foreach (string nt in NoTag)
+                if (nt.Equals(tag))
+                    return false;
+
+            return true;
+        }
+
         public static bool CreateEmpire(string name, string tag, Players.Player emperor)
         {
             if(null != GetEmpire(emperor))
@@ -130,17 +152,14 @@ namespace Imperium
                 return true;
             }
 
-            tag = tag.ToUpper().Trim();
-
-            if(tag.Length > 4)
-            {
-                Chatting.Chat.Send(emperor, "<color=orange>The tag of your empire must be less than 5 characters.</color>");
-                return false;
-            }
-
             new Empire(name, emperor);
 
-            Chatting.Chat.Send(emperor, "<color=orange>You have founded an empire.</color>");
+            Chatting.Chat.Send(emperor, "<color=yellow>You have founded an empire.</color>");
+
+            Empire empire = GetEmpire(emperor);
+
+            if (!empire.SetEmpireTag(tag, emperor))
+                Chatting.Chat.Send(emperor, "<color=orange>You can set the tag of your empire in the settings of your empire.</color>");
 
             return true;
         }
@@ -248,18 +267,18 @@ namespace Imperium
             return CanPermission(GetRank(player), permission);
         }
 
-        public void SetEmpireName(string name, Players.Player player)
+        public bool SetEmpireName(string name, Players.Player player)
         {
             if(!members.ContainsKey(player.ID))
             {
                 Chatting.Chat.Send(player, "<color=orange>You do not belong to any empire.</color>");
-                return;
+                return false;
             }
 
             if(Rank.Emperor != GetRank(player))
             {
                 Chatting.Chat.Send(player, "<color=orange>Only the emperor can change the name of the empire.</color>");
-                return;
+                return false;
             }
 
             name = name.Trim();
@@ -267,7 +286,7 @@ namespace Imperium
             if(name.Length < 4 || name.Length > 50)
             {
                 Chatting.Chat.Send(player, "<color=orange>The name of your empire needs to have between 4 and 50 characters.</color>");
-                return;
+                return false;
             }
 
             this.name = char.ToUpper(name[0]) + name.Substring(1);
@@ -275,35 +294,60 @@ namespace Imperium
             string message = string.Format("<color=yellow>{0} is the new name of the empire.</color>", this.name);
             foreach(Players.Player plr in GetConnectedPlayers())
                 Chatting.Chat.Send(plr, message);
+
+            return true;
         }
 
-        public void SetEmpireTag(string tag, Players.Player player)
+        public bool SetEmpireTag(string tag, Players.Player player)
         {
+            if (tag.Equals(""))
+                return false;
+
             if (!members.ContainsKey(player.ID))
             {
                 Chatting.Chat.Send(player, "<color=orange>You do not belong to any empire.</color>");
-                return;
+                return false;
             }
 
             if (Rank.Emperor != GetRank(player))
             {
                 Chatting.Chat.Send(player, "<color=orange>Only the emperor can change the name of the empire.</color>");
-                return;
+                return false;
             }
 
-            tag = tag.Trim();
+            tag = tag.ToUpper().Trim();
 
             if (tag.Length > 4)
             {
-                Chatting.Chat.Send(player, "<color=orange>The tag of your empire must be less than 5 characters.</color>");
-                return;
+                Chatting.Chat.Send(player, "<color=orange>The tag of your empire must be less than 5 letters.</color>");
+                return false;
             }
 
-            this.tag = tag.ToUpper();
+            if(!tag.All(Char.IsLetter))
+            {
+                Chatting.Chat.Send(player, "<color=orange>The tag can only contain letters.</color>");
+                return false;
+            }
+
+            if (TagUsed(tag))
+            {
+                Chatting.Chat.Send(player, "<color=orange>There is already an empire with that tag.</color>");
+                return false;
+            }
+
+            if(!AllowedTag(tag))
+            {
+                Chatting.Chat.Send(player, "<color=orange>It is not allowed to use that tag.</color>");
+                return false;
+            }
+
+            this.tag = tag;
 
             string message = string.Format("<color=yellow>{0} is the new tag of the empire.</color>", this.tag);
             foreach (Players.Player plr in GetConnectedPlayers())
                 Chatting.Chat.Send(plr, message);
+
+            return true;
         }
 
         /* K: ANNOUNCEMENT SYSTEM

@@ -37,7 +37,7 @@ namespace Imperium
             if (AutomaticChat.activeTeamChat.Contains(causedBy) && empire != null)
             {
                 foreach (Players.Player plr in empire.GetConnectedPlayers())
-                    Chatting.Chat.Send(plr, string.Format("<color=yellow>[{0}][{1}]: {2}</color>", empire.GetRank(causedBy).ToString(), Name, Text));
+                    Chatting.Chat.Send(plr, string.Format("<color=yellow>[{0}]</color>{1}> <color=yellow>{2}</color>", empire.GetRank(causedBy).ToString(), Name, Text));
 
                 return true;
             }
