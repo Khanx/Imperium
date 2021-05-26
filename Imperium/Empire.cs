@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -504,11 +505,13 @@ namespace Imperium
                 return;
             }
 
+            /*
             if(Rank.Emperor == GetRank(player))
             {
                 Chatting.Chat.Send(player, "<color=orange>The emperor can not leave the empire without designating a new emperor.</color>");
                 return;
             }
+            */
 
             members.Remove(player.ID);
             Chatting.Chat.Send(player, "<color=orange>You has left the empire.</color>");
@@ -644,6 +647,29 @@ namespace Imperium
             string message2 = string.Format("<color=orange>{0} has been demoted to {1}.</color>", player.Name, members[player.ID].ToString());
             foreach(Players.Player plr in GetConnectedPlayers())
                 Chatting.Chat.Send(plr, message2);
+        }
+
+        /*
+            Managemnet methods:
+            1- Add Emperor: Set the player (from the staff) as emperor. Reason: An emperor has ALL the permissions and he can use interface instead of commands which will be easier
+            2- Set Rank: Set the player (from the staff) a rank. Reason: It is the only thing that an emperor cannot do, change its own rank
+         */
+
+        //Staff management
+	    public void AddEmperor(Players.Player player)
+	    {
+		    if(GetEmpire(player) != null)
+		    {
+			    Chatting.Chat.Send(player, "<color=orange>You already belongs to an Empire.</color>");
+		    }
+
+		    members.Add(player.ID, Rank.Emperor);
+	    }
+
+        //Staff management
+        public void SetRank(Players.Player player, Rank rank)
+        {
+            members[player.ID] = rank;
         }
 
         public Empire(JSONNode json)

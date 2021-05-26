@@ -397,7 +397,6 @@ namespace Imperium
             NetworkMenuManager.SendServerPopup(player, menu);
         }
 
-
         public static void SendMenuBelong(Players.Player player)
         {
             NetworkMenu menu = new NetworkMenu();
@@ -447,6 +446,62 @@ namespace Imperium
             NetworkMenuManager.SendServerPopup(player, menu);
         }
 
+        public static void SendMenuManage(Players.Player player)
+        {
+            NetworkMenu menu = new NetworkMenu();
+            menu.LocalStorage.SetAs("header", "Empires");
+            menu.Width = 550;
+
+            var table = new NetworkUI.Items.Table(550, 180);
+            table.ExternalMarginHorizontal = 0f;
+            {
+                var headerRow = new NetworkUI.Items.HorizontalRow(new List<(IItem, int)>()
+                {
+                    (new NetworkUI.Items.Label("Empire"), 250),
+                     (new NetworkUI.Items.Label("Action"), 250),
+                });
+                var headerBG = new NetworkUI.Items.BackgroundColor(headerRow, height: -1, color: NetworkUI.Items.Table.HEADER_COLOR);
+                table.Header = headerBG;
+            }
+            table.Rows = new List<IItem>();
+
+            var orderedEmpire = from empire in Empire.empires orderby empire.GetPlayers().Count() descending select empire;
+
+            foreach (Empire empire in orderedEmpire)
+            {
+                List<(IItem, int)> emp = new List<(IItem, int)>();
+                emp.Add((new NetworkUI.Items.Label(empire.name), 250));
+
+                emp.Add((new NetworkUI.Items.ButtonCallback("Empire_ManageAsEmperor_" + empire.name, new LabelData("Manage as Emperor", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup), 250));
+
+                table.Rows.Add(new NetworkUI.Items.HorizontalRow(emp));
+            }
+
+            menu.Items.Add(table);
+
+            NetworkMenuManager.SendServerPopup(player, menu);
+        }
+
+        public static void SendMenuSetRank(Players.Player player)
+        {
+            NetworkMenu menu = new NetworkMenu();
+            menu.LocalStorage.SetAs("header", "Set Rank");
+            menu.Width = 550;
+
+            Empire empire = Empire.GetEmpire(player);
+
+            if (empire == null)
+                return;
+
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetRank_Emperor", new LabelData("Emperor", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetRank_Duke", new LabelData("Duke", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetRank_Marquis", new LabelData("Marquis", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetRank_Count", new LabelData("Count", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetRank_Baron", new LabelData("Baron", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetRank_Lord", new LabelData("Lord", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
+
+            NetworkMenuManager.SendServerPopup(player, menu);
+        }
 
         [ModLoader.ModCallback(ModLoader.EModCallbackType.OnPlayerPushedNetworkUIButton, "Khanx.Imperium.PressButton")]
         public static void EmpireButtonManager(ButtonPressCallbackData data)
@@ -613,6 +668,34 @@ namespace Imperium
                         bool automaticRequest = data.Storage.GetAs<bool>("AutomaticRequest");
                         if (empire.automaticRequest != automaticRequest)
                             empire.SetAutomaticRequest(automaticRequest, data.Player);
+                    }
+                    break;
+
+                    case "ManageAsEmperor":
+                    {
+                        empire = Empire.GetEmpire(target);
+
+                        if (null != empire)
+                            empire.AddEmperor(data.Player);
+                    }
+                    break;
+
+                    case "SetRank":
+                    {
+                        if (empire == null)
+                            return;
+
+                        switch(target)
+                        {
+                            case "Emperor": empire.SetRank(data.Player, Rank.Emperor); break;
+                            case "Duke": empire.SetRank(data.Player, Rank.Duke); break;
+                            case "Marquis": empire.SetRank(data.Player, Rank.Marquis); break;
+                            case "Count": empire.SetRank(data.Player, Rank.Count); break;
+                            case "Baron": empire.SetRank(data.Player, Rank.Baron); break;
+                            case "Lord": empire.SetRank(data.Player, Rank.Lord); break;
+                        }
+
+                        Chatting.Chat.Send(data.Player, "Rank set to " + target);
                     }
                     break;
                 }
