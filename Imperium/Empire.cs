@@ -661,6 +661,7 @@ namespace Imperium
 		    if(GetEmpire(player) != null)
 		    {
 			    Chatting.Chat.Send(player, "<color=orange>You already belongs to an Empire.</color>");
+                return;
 		    }
 
 		    members.Add(player.ID, Rank.Emperor);
