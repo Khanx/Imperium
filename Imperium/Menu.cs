@@ -221,6 +221,7 @@ namespace Imperium
             menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/empire - Show information about your current empire", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleLeft, 20)));
             menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/empires - Show information about ALL the empires", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleLeft, 20)));
             menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/belong_empire - Show the affiliation of each connected player", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleLeft, 20)));
+            menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/belong_empire <playername> - Show the affiliation of <playername>", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleLeft, 20)));
 
             menu.Items.Add(new NetworkUI.Items.EmptySpace(15));
 
@@ -233,6 +234,16 @@ namespace Imperium
             menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/leave_empire - Remove you from your current empire", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleLeft, 20)));
 
             menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/disband_empire - Disand the current empire (Only EMPEROR)", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleLeft, 20)));
+
+            if(PermissionsManager.HasPermission(player, "khanx.imperium"))
+            {
+                menu.Items.Add(new NetworkUI.Items.EmptySpace(15));
+                menu.Items.Add(new NetworkUI.Items.Label(new LabelData("Staff Commands", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter, 45)));
+
+                menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/empire_asemperor - Shows an interface that allows you to be the emperor of ANY empire.", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleLeft, 20)));
+
+                menu.Items.Add(new NetworkUI.Items.Label(new LabelData("/empire_setrank - Allows you to change your rank in the empire you are in.", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleLeft, 20)));
+            }
 
             NetworkMenuManager.SendServerPopup(player, menu);
         }
