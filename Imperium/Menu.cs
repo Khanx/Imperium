@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using NetworkUI;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace Imperium
 {
@@ -17,9 +18,8 @@ namespace Imperium
             menu.LocalStorage.SetAs("header", "Empires");
             menu.Width = 550;
 
-
             if (!belongEmpire)
-                menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_NewEmpire_NOTHING", new LabelData("Found a new empire", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
+                menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_NewEmpire", new LabelData("Found a new empire", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
 
             var table = new NetworkUI.Items.Table(550, 180);
             table.ExternalMarginHorizontal = 0f;
@@ -43,9 +43,9 @@ namespace Imperium
                 emp.Add((new NetworkUI.Items.Label(empire.name), 250));
 
                 if (!belongEmpire && !empire.joinRequest.Contains(player.ID) && empire.GetPlayers().Count <= maxMembers)
-                    emp.Add((new NetworkUI.Items.ButtonCallback("Empire_Apply_" + empire.name, new LabelData("Apply", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 150));
+                    emp.Add((new NetworkUI.Items.ButtonCallback("Imperium_Apply", new LabelData("Apply", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "empire", empire.name } }), 150));
                 else
-                    emp.Add((new NetworkUI.Items.ButtonCallback("Empire_Apply_" + empire.name, new LabelData("Apply", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), isInteractive: false), 150));
+                    emp.Add((new NetworkUI.Items.ButtonCallback("Imperium_Apply", new LabelData("Apply", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), isInteractive: false), 150));
 
                 emp.Add((new NetworkUI.Items.Label(empire.GetPlayers().Count.ToString() + "/" + maxMembers), 100));
 
@@ -71,7 +71,7 @@ namespace Imperium
             menu.Items.Add(new NetworkUI.Items.Label("Empire Tag"));
             menu.Items.Add(new NetworkUI.Items.InputField("EmpireTag"));
 
-            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_FoundEmpire_NOTHING", new LabelData("Create empire", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_FoundEmpire", new LabelData("Create empire", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
 
             NetworkMenuManager.SendServerPopup(player, menu);
         }
@@ -121,10 +121,10 @@ namespace Imperium
 
                 requests.Add((new NetworkUI.Items.Label(plr.Name), 250));
                 if(empire.GetPlayers().Count < maxMembers)
-                    requests.Add((new NetworkUI.Items.ButtonCallback("Empire_AcceptRequest_" + plr.Name, new LabelData("Accept", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 125));
+                    requests.Add((new NetworkUI.Items.ButtonCallback("Imperium_Request", new LabelData("Accept", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "accept", true }, { "player", player.ID.ToString() } }), 125));
                 else
-                    requests.Add((new NetworkUI.Items.ButtonCallback("Empire_AcceptRequest_" + plr.Name, new LabelData("Accept", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), isInteractive: false), 125));
-                requests.Add((new NetworkUI.Items.ButtonCallback("Empire_RejectRequest_" + plr.Name, new LabelData("Reject", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 125));
+                    requests.Add((new NetworkUI.Items.ButtonCallback("Imperium_Request", new LabelData("Accept", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), isInteractive: false), 125));
+                requests.Add((new NetworkUI.Items.ButtonCallback("Imperium_Request", new LabelData("Reject", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "accept", false }, { "player", player.ID.ToString() } }), 125));
 
                 table.Rows.Add(new NetworkUI.Items.HorizontalRow(requests));
             }
@@ -159,16 +159,16 @@ namespace Imperium
                 }
             */
 
-            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_HELP_NOTHING", new LabelData("HELP", UnityEngine.Color.yellow, UnityEngine.TextAnchor.MiddleCenter)));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_HELP", new LabelData("HELP", UnityEngine.Color.yellow, UnityEngine.TextAnchor.MiddleCenter)));
 
             if (empire.CanPermission(player, Permissions.Invite))
                 if (empire.joinRequest.Count > 0)
-                    menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_ApplyManage_NOTHING", new LabelData("Manage applications", UnityEngine.Color.green, UnityEngine.TextAnchor.MiddleCenter)));
+                    menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_ApplyManage", new LabelData("Manage applications", UnityEngine.Color.green, UnityEngine.TextAnchor.MiddleCenter)));
 
             if (empire.GetRank(player) == Rank.Emperor)
             {
-                menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_BackPermission_NOTHING", new LabelData("Set Permissions", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
-                menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SettingsMenu_NOTHING", new LabelData("Settings", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
+                menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_BackPermission", new LabelData("Set Permissions", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
+                menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_SettingsMenu", new LabelData("Settings", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
             }
 
 
@@ -194,7 +194,7 @@ namespace Imperium
                 members.Add((new NetworkUI.Items.Label(empire.GetRank(plr).ToString()), 125));
 
                 if ((empire.CanPermission(player, Permissions.Ranks) || empire.CanPermission(player, Permissions.Kick)) && (empire.GetRank(player) < empire.GetRank(plr) || empire.GetRank(player) == Rank.Emperor) && !player.ID.Equals(plr.ID))
-                    members.Add((new NetworkUI.Items.ButtonCallback("Empire_Manage_" + plr.Name, new LabelData("Manage", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)), 125));
+                    members.Add((new NetworkUI.Items.ButtonCallback("Imperium_Manage", new LabelData("Manage", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "player", player.ID.ToString() } }), 125));
                 else
                     members.Add((new NetworkUI.Items.EmptySpace(), 125));
 
@@ -282,9 +282,9 @@ namespace Imperium
 
             NetworkUI.Items.ButtonCallback b_Promote, b_Demote, b_Kick;
 
-            b_Promote = new NetworkUI.Items.ButtonCallback("Empire_Promote_" + player2.Name, new LabelData("Promote", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter));
-            b_Demote = new NetworkUI.Items.ButtonCallback("Empire_Demote_" + player2.Name, new LabelData("Demote", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter));
-            b_Kick = new NetworkUI.Items.ButtonCallback("Empire_Kick_" + player2.Name, new LabelData("Kick", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter));
+            b_Promote = new NetworkUI.Items.ButtonCallback("Imperium_Promote" + player2.ID, new LabelData("Promote", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "player", player2.ID.ToString() } });
+            b_Demote = new NetworkUI.Items.ButtonCallback("Imperium_Demote" + player2.ID, new LabelData("Demote", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "player", player2.ID.ToString() } });
+            b_Kick = new NetworkUI.Items.ButtonCallback("Imperium_Kick" + player2.ID, new LabelData("Kick", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "player", player2.ID.ToString() } });
 
                 //You can only Kick people with LOWER rank than you
                 if (!empire.CanPermission(p1_rank, Permissions.Kick) || p1_rank >= p2_rank)
@@ -342,7 +342,7 @@ namespace Imperium
             menu.LocalStorage.SetAs("AutomaticRequest", empire.automaticRequest);
             menu.Items.Add(new NetworkUI.Items.Toggle("Automatically accept joining request to the empire", "AutomaticRequest"));
 
-            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetSettings_NOTHING", new LabelData("Save", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_SetSettings", new LabelData("Save", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
 
             NetworkMenuManager.SendServerPopup(player, menu);
         }
@@ -369,7 +369,7 @@ namespace Imperium
             // 0 = emperor
             for (int i = 1; i < (int)Rank.None; i++)
             {
-                menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_Permission_" + i, new LabelData(((Rank)i).ToString(), UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
+                menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_Permission", new LabelData(((Rank)i).ToString(), UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "rank", i } }));
             }
 
             NetworkMenuManager.SendServerPopup(player, menu);
@@ -402,8 +402,8 @@ namespace Imperium
 
             List<IItem> buttons = new List<IItem>();
 
-            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetPermission_" + rank, new LabelData("Save", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
-            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_BackPermission_NOTHING", new LabelData("Back", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_SetPermission", new LabelData("Save", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "rank", rank } }));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_BackPermission", new LabelData("Back", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
 
             NetworkMenuManager.SendServerPopup(player, menu);
         }
@@ -483,7 +483,7 @@ namespace Imperium
                 List<(IItem, int)> emp = new List<(IItem, int)>();
                 emp.Add((new NetworkUI.Items.Label(empire.name), 250));
 
-                emp.Add((new NetworkUI.Items.ButtonCallback("Empire_ManageAsEmperor_" + empire.name, new LabelData("Manage as Emperor", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup), 250));
+                emp.Add((new NetworkUI.Items.ButtonCallback("Imperium_ManageAsEmperor", new LabelData("Manage as Emperor", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup, ButtonPayload: new JObject() { { "empire", empire.name } }), 250));
 
                 table.Rows.Add(new NetworkUI.Items.HorizontalRow(emp));
             }
@@ -504,12 +504,12 @@ namespace Imperium
             if (empire == null)
                 return;
 
-            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetRank_Emperor", new LabelData("Emperor", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
-            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetRank_Duke", new LabelData("Duke", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
-            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetRank_Marquis", new LabelData("Marquis", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
-            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetRank_Count", new LabelData("Count", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
-            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetRank_Baron", new LabelData("Baron", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
-            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Empire_SetRank_Lord", new LabelData("Lord", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_SetRank", new LabelData("Emperor", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup, ButtonPayload: new JObject() { { "rank", 0 } }));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_SetRank", new LabelData("Duke", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup, ButtonPayload: new JObject() { { "rank", 1 } }));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_SetRank", new LabelData("Marquis", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup, ButtonPayload: new JObject() { { "rank", 2 } }));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_SetRank", new LabelData("Count", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup, ButtonPayload: new JObject() { { "rank", 3 } }));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_SetRank", new LabelData("Baron", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup, ButtonPayload: new JObject() { { "rank", 4 } }));
+            menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_SetRank", new LabelData("Lord", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup, ButtonPayload: new JObject() { { "rank", 5 } }));
 
             NetworkMenuManager.SendServerPopup(player, menu);
         }
@@ -517,200 +517,183 @@ namespace Imperium
         [ModLoader.ModCallback(ModLoader.EModCallbackType.OnPlayerPushedNetworkUIButton, "Khanx.Imperium.PressButton")]
         public static void EmpireButtonManager(ButtonPressCallbackData data)
         {
-            if (data.ButtonIdentifier.StartsWith("Empire"))
+            Empire empire = null;
+            Players.Player plr;
+
+            switch (data.ButtonIdentifier)
             {
-                string[] args = data.ButtonIdentifier.Split('_');
-
-                string action = args[1];
-                string target = args[2];
-
-                Empire empire = Empire.GetEmpire(data.Player);
-
-                switch (action)
+                case "Imperium_NewEmpire":
                 {
-                    case "Manage":
-                    {
-                        if (Players.TryMatchName(target, out Players.Player plr))
-                            SendMenuEmpireManage(data.Player, plr);
-                    }
+                    SendMenuFoundEmpire(data.Player);
+                }
                     break;
 
-                    case "Promote":
-                    {
-                        if (Players.TryMatchName(target, out Players.Player plr))
-                            if (null != empire)
-                            {
-                                empire.Promote(plr, data.Player);
-                                SendMenuEmpireManage(data.Player, plr);
-                            }
-                    }
-                    break;
+                case "Imperium_FoundEmpire":
+                {
+                    Empire.CreateEmpire(data.Storage.GetAs<string>("EmpireName"), data.Storage.GetAs<string>("EmpireTag"), data.Player);
+                }
+                break;
 
-                    case "Demote":
-                    {
-                        if (Players.TryMatchName(target, out Players.Player plr))
-                            if (null != empire)
-                            {
-                                empire.Demote(plr, data.Player);
-                                SendMenuEmpireManage(data.Player, plr);
-                            }
-                    }
-                    break;
+                case "Imperium_Apply":
+                {
+                    empire = Empire.GetEmpire(data.ButtonPayload.Value<string>("empire"));
+                    if (null != empire)
+                        empire.ApplyFor(data.Player);
+                    SendMenuEmpireList(data.Player);
+                }
+                break;
 
-                    case "Kick":
-                    {
-                        if (Players.TryMatchName(target, out Players.Player plr))
-                            if (null != empire)
-                            {
-                                empire.Kick(plr, data.Player);
-                                SendMenuEmpireManage(data.Player, plr);
-                            }
-                    }
-                    break;
+                case "Imperium_Request":
+                {
+                    empire = Empire.GetEmpire(data.Player);
 
-                    case "Permission":
-                    {
-                        int rank = int.Parse(target);
-                        SendMenuPermissionsManagement(data.Player, rank);
-                    }
-                    break;
+                    if (empire == null)
+                        return;
 
-                    case "BackPermission":
-                    {
-                        SendMenuPermissions(data.Player);
-                    }
-                    break;
+                    if (Players.TryGetPlayer(NetworkID.Parse(data.ButtonPayload.Value<string>("player")), out plr))
 
-                    case "SetPermission":
-                    {
-                        int rank = int.Parse(target);
-
-                        Permissions newPermission = 0;
-
-                        for (int i = (int)Permissions.Invite; i < (int)Permissions.Disband; i *= 2)
-                            if (data.Storage.GetAs<bool>(((Permissions)i).ToString()))
-                                newPermission |= (Permissions)i;
-
-                        if (null != empire)
-                            empire.SetPermissions(data.Player, (Rank)rank, newPermission);
-                    }
-                    break;
-
-                    case "Apply":
-                    {
-                        empire = Empire.GetEmpire(target);
-                        if (null != empire)
-                            empire.ApplyFor(data.Player);
-                        SendMenuEmpireList(data.Player);
-                    }
-                    break;
-
-                    case "ApplyManage":
-                    {
-                        SendMenuEmpireRequest(data.Player);
-                    }
-                    break;
-
-                    case "AcceptRequest":
-                    {
-                        if (Players.TryMatchName(target, out Players.Player plr))
-                            if (null != empire)
-                                empire.Invite(plr, data.Player);
-
-                        if (empire.joinRequest.Count > 0)
-                            SendMenuEmpireRequest(data.Player);
-                        else
-                            SendMenuEmpire(data.Player);
-                    }
-                    break;
-
-                    case "RejectRequest":
-                    {
-                        if (Players.TryMatchName(target, out Players.Player plr))
-                            if (null != empire)
-                                if (empire.joinRequest.Contains(plr.ID))
-                                {
-
-                                    empire.joinRequest.Remove(plr.ID);
-                                    Chatting.Chat.Send(plr, string.Format("<color=green>{0} has rejected your request of joining.</color>", empire.name));
-                                }
-
-                        if (empire.joinRequest.Count > 0)
-                            SendMenuEmpireRequest(data.Player);
-                        else
-                            SendMenuEmpire(data.Player);
-                    }
-                    break;
-
-                    case "FoundEmpire":
-                    {
-                            Empire.CreateEmpire(data.Storage.GetAs<string>("EmpireName"), data.Storage.GetAs<string>("EmpireTag"), data.Player);
-                    }
-                    break;
-
-                    case "NewEmpire":
-                    {
-                            SendMenuFoundEmpire(data.Player);
-                    }
-                    break;
-
-                    case "HELP":
-                    {
-                        SendMenuHelp(data.Player);
-                    }
-                    break;
-
-                    case "SettingsMenu":
-                    {
-                        SendMenuEmpireSettings(data.Player);
-                    }
-                    break;
-
-                    case "SetSettings":
-                    {
-                        string newName = data.Storage.GetAs<string>("EmpireName");
-                        if(!empire.name.Equals(newName))
-                            empire.SetEmpireName(newName, data.Player);
-
-                        string newTag = data.Storage.GetAs<string>("EmpireTag");
-                        if (!empire.tag.Equals(newTag))
-                            empire.SetEmpireTag(newTag, data.Player);
-
-                        bool automaticRequest = data.Storage.GetAs<bool>("AutomaticRequest");
-                        if (empire.automaticRequest != automaticRequest)
-                            empire.SetAutomaticRequest(automaticRequest, data.Player);
-                    }
-                    break;
-
-                    case "ManageAsEmperor":
-                    {
-                        empire = Empire.GetEmpire(target);
-
-                        if (null != empire)
-                            empire.AddEmperor(data.Player);
-                    }
-                    break;
-
-                    case "SetRank":
-                    {
-                        if (empire == null)
-                            return;
-
-                        switch(target)
+                        if(data.ButtonPayload.Value<bool>("accept"))
                         {
-                            case "Emperor": empire.SetRank(data.Player, Rank.Emperor); break;
-                            case "Duke": empire.SetRank(data.Player, Rank.Duke); break;
-                            case "Marquis": empire.SetRank(data.Player, Rank.Marquis); break;
-                            case "Count": empire.SetRank(data.Player, Rank.Count); break;
-                            case "Baron": empire.SetRank(data.Player, Rank.Baron); break;
-                            case "Lord": empire.SetRank(data.Player, Rank.Lord); break;
+                            empire.Invite(plr, data.Player);
+                        }
+                        else
+                        {
+                            empire.joinRequest.Remove(plr.ID);
+                            Chatting.Chat.Send(plr, string.Format("<color=green>{0} has rejected your request of joining.</color>", empire.name));
                         }
 
-                        Chatting.Chat.Send(data.Player, "Rank set to " + target);
-                    }
-                    break;
+                    if (empire.joinRequest.Count > 0)
+                        SendMenuEmpireRequest(data.Player);
+                    else
+                        SendMenuEmpire(data.Player);
                 }
+                break;
+
+                case "Imperium_HELP":
+                {
+                    SendMenuHelp(data.Player);
+                }
+                break;
+
+                case "Imperium_ApplyManage":
+                {
+                    SendMenuEmpireRequest(data.Player);
+                }
+                break;
+
+                case "Imperium_BackPermission":
+                {
+                    SendMenuPermissions(data.Player);
+                }
+                break;
+
+                case "Imperium_SettingsMenu":
+                {
+                    SendMenuEmpireSettings(data.Player);
+                }
+                break;
+
+                case "Imperium_Manage":
+                {
+                    if (Players.TryGetPlayer(NetworkID.Parse(data.ButtonPayload.Value<string>("player")), out plr))
+                        SendMenuEmpireManage(data.Player, plr);
+                }
+                break;
+
+                case "Imperium_Promote":
+                {
+                    if (Players.TryGetPlayer(NetworkID.Parse(data.ButtonPayload.Value<string>("player")), out plr))
+                        if (null != empire)
+                        {
+                            empire.Promote(plr, data.Player);
+                            SendMenuEmpireManage(data.Player, plr);
+                        }
+                }
+                break;
+
+                case "Imperium_Demote":
+                {
+                    if (Players.TryGetPlayer(NetworkID.Parse(data.ButtonPayload.Value<string>("player")), out plr))
+                        if (null != empire)
+                        {
+                            empire.Demote(plr, data.Player);
+                            SendMenuEmpireManage(data.Player, plr);
+                        }
+                }
+                break;
+
+                case "Imperium_Kick":
+                {
+                    if (Players.TryGetPlayer(NetworkID.Parse(data.ButtonPayload.Value<string>("player")), out plr))
+                        if (null != empire)
+                        {
+                            empire.Kick(plr, data.Player);
+                            SendMenuEmpireManage(data.Player, plr);
+                        }
+                }
+                break;
+
+                case "Imperium_SetSettings":
+                {
+                    string newName = data.Storage.GetAs<string>("EmpireName");
+                    if (!empire.name.Equals(newName))
+                        empire.SetEmpireName(newName, data.Player);
+
+                    string newTag = data.Storage.GetAs<string>("EmpireTag");
+                    if (!empire.tag.Equals(newTag))
+                        empire.SetEmpireTag(newTag, data.Player);
+
+                    bool automaticRequest = data.Storage.GetAs<bool>("AutomaticRequest");
+                    if (empire.automaticRequest != automaticRequest)
+                        empire.SetAutomaticRequest(automaticRequest, data.Player);
+                }
+                break;
+
+                case "Imperium_Permission":
+                {
+                    int rank = data.ButtonPayload.Value<int>("rank");
+                    SendMenuPermissionsManagement(data.Player, rank);
+                }
+                    break;
+
+                case "Imperium_SetPermission":
+                {
+                    int rank = data.ButtonPayload.Value<int>("rank");
+
+                    Permissions newPermission = 0;
+
+                    for (int i = (int)Permissions.Invite; i < (int)Permissions.Disband; i *= 2)
+                        if (data.Storage.GetAs<bool>(((Permissions)i).ToString()))
+                            newPermission |= (Permissions)i;
+
+                    if (null != empire)
+                        empire.SetPermissions(data.Player, (Rank)rank, newPermission);
+                }
+                    break;
+
+                case "Imperium_ManageAsEmperor":
+                {
+                    empire = Empire.GetEmpire(data.ButtonPayload.Value<string>("empire"));
+
+                    if (null != empire)
+                        empire.AddEmperor(data.Player);
+                }
+                    break;
+
+                case "Imperium_SetRank":
+                {
+                    if (empire == null)
+                        return;
+
+                    Rank rank = (Rank)data.ButtonPayload.Value<int>("rank");
+
+                    empire.SetRank(data.Player, rank);
+
+                    Chatting.Chat.Send(data.Player, "Rank set to " + rank.ToString());
+                }
+                    break;
             }
+
         }
     }
 }
