@@ -252,8 +252,13 @@ namespace Imperium
 
         public Rank GetRank(Players.Player player)
         {
-            if(members.ContainsKey(player.ID))
-                return members[player.ID];
+            return GetRank(player.ID);
+        }
+
+        public Rank GetRank(NetworkID playerID)
+        {
+            if (members.ContainsKey(playerID))
+                return members[playerID];
 
             return Rank.None;
         }
@@ -263,9 +268,9 @@ namespace Imperium
             return ( permissions[(int)rank] & permission ) == permission;
         }
 
-        public bool CanPermission(Players.Player player, Permissions permission)
+        public bool CanPermission(NetworkID playerID, Permissions permission)
         {
-            return CanPermission(GetRank(player), permission);
+            return CanPermission(GetRank(playerID), permission);
         }
 
         public bool SetEmpireName(string name, Players.Player player)
@@ -447,7 +452,7 @@ namespace Imperium
         {
             Rank rank = GetRank(causedBy);
 
-            if(!CanPermission(causedBy, Permissions.Invite))
+            if(!CanPermission(causedBy.ID, Permissions.Invite))
             {
                 Chatting.Chat.Send(causedBy, "<color=orange>You do not have permission to invite.</color>");
                 return;
@@ -529,7 +534,7 @@ namespace Imperium
                 return;
             }
 
-            if(!CanPermission(causedBy, Permissions.Kick))
+            if(!CanPermission(causedBy.ID, Permissions.Kick))
             {
                 Chatting.Chat.Send(causedBy, "<color=orange>You do not have permission to kick.</color>");
                 return;
@@ -568,7 +573,7 @@ namespace Imperium
                 return;
             }
 
-            if(!CanPermission(causedBy, Permissions.Ranks))
+            if(!CanPermission(causedBy.ID, Permissions.Ranks))
             {
                 Chatting.Chat.Send(causedBy, "<color=orange>You do not have permission to promote / demote.</color>");
                 return;
@@ -617,7 +622,7 @@ namespace Imperium
 
             Rank rankCausedBy = GetRank(causedBy);
 
-            if(!CanPermission(causedBy, Permissions.Ranks))
+            if(!CanPermission(causedBy.ID, Permissions.Ranks))
             {
                 Chatting.Chat.Send(causedBy, "<color=orange>You do not have permission to promote / demote.</color>");
                 return;
