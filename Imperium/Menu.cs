@@ -497,7 +497,8 @@ namespace Imperium
         {
             NetworkMenu menu = new NetworkMenu();
             menu.LocalStorage.SetAs("header", "Set Rank");
-            menu.Width = 550;
+            menu.Width = 250;
+            menu.Height= 265;
 
             Empire empire = Empire.GetEmpire(player);
 
@@ -694,6 +695,8 @@ namespace Imperium
 
                 case "Imperium_SetRank":
                 {
+                    empire = Empire.GetEmpire(data.Player);
+
                     if (empire == null)
                         return;
 
