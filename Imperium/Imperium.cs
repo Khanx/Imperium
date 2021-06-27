@@ -6,20 +6,6 @@ namespace Imperium
     [ModLoader.ModManager]
     public static class Imperium
     {
-        public static bool ColonyCommandsMod = false;
-
-        [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterModsLoaded, "Khanx.Imperium.AfterModsLoaded")]
-        public static void AfterModsLoaded(System.Collections.Generic.List<ModLoader.ModDescription> mods)
-        {
-            for (int i = 0; i < mods.Count; i++)
-            {
-                if (mods[i].name == "Colony Commands")
-                {
-                    ColonyCommandsMod = true;
-                    Log.Write("Imperium: found ColonyCommands mod, disabling chat");
-                }
-            }
-        }
 
         /// <summary>
         /// This method implements the AutomaticChat for the Colony Commands Mod in order to avoid conflicts between mods

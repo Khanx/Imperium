@@ -145,7 +145,8 @@ namespace Imperium
             }
 
             NetworkMenu menu = new NetworkMenu();
-            menu.Width = 600;
+            menu.Width = 700;
+            menu.Height = 600;
             menu.LocalStorage.SetAs("header", empire.name);
 
 
@@ -172,15 +173,21 @@ namespace Imperium
             }
 
 
-            var table = new NetworkUI.Items.Table(600, 800);
+            var table = new NetworkUI.Items.Table(700, 800);
             table.ExternalMarginHorizontal = 0f;
             {
-                var headerRow = new NetworkUI.Items.HorizontalRow(new List<(IItem, int)>()
-                {
-                    (new NetworkUI.Items.Label("Name"), 250),
-                    (new NetworkUI.Items.Label("Rank"), 125),
-                    (new NetworkUI.Items.EmptySpace(), 125),
-                });
+                var headerRow = new NetworkUI.Items.HorizontalRow();
+
+                headerRow.Items = new List<(IItem, int)>();
+
+                headerRow.Items.Add((new NetworkUI.Items.Label("Name"), 250));
+                headerRow.Items.Add((new NetworkUI.Items.Label("Rank"), 125));
+
+                if(ColonyCommands.ColonyCommandsMod.ColonyCommands)
+                    headerRow.Items.Add((new NetworkUI.Items.Label("Last seen"), 125));
+
+                headerRow.Items.Add((new NetworkUI.Items.EmptySpace(), 125));
+
                 var headerBG = new NetworkUI.Items.BackgroundColor(headerRow, height: -1, color: NetworkUI.Items.Table.HEADER_COLOR);
                 table.Header = headerBG;
             }
@@ -193,6 +200,23 @@ namespace Imperium
                 members.Add((new NetworkUI.Items.Label(plr.Name), 250));
                 members.Add((new NetworkUI.Items.Label(empire.GetRank(plr).ToString()), 125));
 
+                if (ColonyCommands.ColonyCommandsMod.ColonyCommands)
+                {
+                    var m = ColonyCommands.ColonyCommandsMod.getMethodFromColonyCommandsMod("ActivityTracker", "GetLastSeen");
+
+                    if (m != null)
+                    {
+                        string lastseen = (string)m.Invoke(null, new object[] { plr.ID.ToStringReadable() });
+
+                        if (!lastseen.Equals("never"))
+                            lastseen = lastseen.Substring(0, lastseen.IndexOf(" ")).Trim();
+
+                        members.Add((new NetworkUI.Items.Label(lastseen), 125));
+                    }
+                    else
+                        members.Add((new NetworkUI.Items.EmptySpace(), 125));
+                }
+                
                 if ((empire.CanPermission(player.ID, Permissions.Ranks) || empire.CanPermission(player.ID, Permissions.Kick)) && (empire.GetRank(player) < empire.GetRank(plr) || empire.GetRank(player) == Rank.Emperor) && !player.ID.Equals(plr.ID))
                     members.Add((new NetworkUI.Items.ButtonCallback("Imperium_Manage", new LabelData("Manage", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "player", plr.ID.ToString() } }), 125));
                 else

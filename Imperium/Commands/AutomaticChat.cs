@@ -48,7 +48,7 @@ namespace Imperium.Commands
                 return false;
             }
             
-            if (Imperium.ColonyCommandsMod)
+            if (ColonyCommands.ColonyCommandsMod.ColonyCommands)
                 return true;
 
             if(!activeTeamChat.Contains(player) && empire != null && !empire.tag.Equals(""))

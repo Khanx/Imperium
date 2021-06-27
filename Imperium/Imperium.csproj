@@ -64,6 +64,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColonyCommands\ColonyCommandsMod.cs" />
+    <Compile Include="Commands\TestCommand.cs" />
     <Compile Include="Commands\SetRank.cs" />
     <Compile Include="Commands\AsEmperor.cs" />
     <Compile Include="Imperium.cs" />
