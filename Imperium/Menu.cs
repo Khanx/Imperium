@@ -17,6 +17,7 @@ namespace Imperium
             NetworkMenu menu = new NetworkMenu();
             menu.LocalStorage.SetAs("header", "Empires");
             menu.Width = 550;
+            menu.Height = 600;
 
             if (!belongEmpire)
                 menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_NewEmpire", new LabelData("Found a new empire", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
@@ -486,6 +487,7 @@ namespace Imperium
             NetworkMenu menu = new NetworkMenu();
             menu.LocalStorage.SetAs("header", "Empires");
             menu.Width = 550;
+            menu.Height = 600;
 
             var table = new NetworkUI.Items.Table(550, 180);
             table.ExternalMarginHorizontal = 0f;
