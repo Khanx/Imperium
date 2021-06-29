@@ -564,6 +564,7 @@ namespace Imperium
                 case "Imperium_Apply":
                 {
                     empire = Empire.GetEmpire(data.ButtonPayload.Value<string>("empire"));
+
                     if (null != empire)
                         empire.ApplyFor(data.Player);
                     SendMenuEmpireList(data.Player);
@@ -674,17 +675,22 @@ namespace Imperium
 
                 case "Imperium_SetSettings":
                 {
-                    string newName = data.Storage.GetAs<string>("EmpireName");
-                    if (!empire.name.Equals(newName))
-                        empire.SetEmpireName(newName, data.Player);
+                    empire = Empire.GetEmpire(data.Player);
 
-                    string newTag = data.Storage.GetAs<string>("EmpireTag");
-                    if (!empire.tag.Equals(newTag))
-                        empire.SetEmpireTag(newTag, data.Player);
+                    if (null != empire)
+                    {
+                        string newName = data.Storage.GetAs<string>("EmpireName");
+                        if (!empire.name.Equals(newName))
+                            empire.SetEmpireName(newName, data.Player);
 
-                    bool automaticRequest = data.Storage.GetAs<bool>("AutomaticRequest");
-                    if (empire.automaticRequest != automaticRequest)
-                        empire.SetAutomaticRequest(automaticRequest, data.Player);
+                        string newTag = data.Storage.GetAs<string>("EmpireTag");
+                        if (!empire.tag.Equals(newTag))
+                            empire.SetEmpireTag(newTag, data.Player);
+
+                        bool automaticRequest = data.Storage.GetAs<bool>("AutomaticRequest");
+                        if (empire.automaticRequest != automaticRequest)
+                            empire.SetAutomaticRequest(automaticRequest, data.Player);
+                    }
                 }
                 break;
 
@@ -697,16 +703,20 @@ namespace Imperium
 
                 case "Imperium_SetPermission":
                 {
-                    int rank = data.ButtonPayload.Value<int>("rank");
+                    empire = Empire.GetEmpire(data.Player);
 
-                    Permissions newPermission = 0;
+                    if(empire!=null)
+                    {
+                        int rank = data.ButtonPayload.Value<int>("rank");
 
-                    for (int i = (int)Permissions.Invite; i < (int)Permissions.Disband; i *= 2)
-                        if (data.Storage.GetAs<bool>(((Permissions)i).ToString()))
-                            newPermission |= (Permissions)i;
+                        Permissions newPermission = 0;
 
-                    if (null != empire)
+                        for (int i = (int)Permissions.Invite; i < (int)Permissions.Disband; i *= 2)
+                            if (data.Storage.GetAs<bool>(((Permissions)i).ToString()))
+                                newPermission |= (Permissions)i;
+
                         empire.SetPermissions(data.Player, (Rank)rank, newPermission);
+                    }
                 }
                     break;
 
