@@ -13,7 +13,7 @@ namespace Imperium.Commands
 
             Chatting.Chat.SendToConnected("/empire_test detected");
 
-            var m = ColonyCommands.ColonyCommandsMod.getMethodFromColonyCommandsMod("ActivityTracker", "GetLastSeen");
+            var m = ColonyCommands.ColonyCommandsMod.GetMethodFromColonyCommandsMod("ActivityTracker", "GetLastSeen");
 
             if (m != null)
                 Chatting.Chat.SendToConnected("Method found");

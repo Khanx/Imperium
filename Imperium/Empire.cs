@@ -60,16 +60,16 @@ namespace Imperium
     {
         public static List<Empire> empires = new List<Empire>();
 
-        public string name { get; internal set; } = "";
-        public string tag { get; internal set; } = "";
+        public string Name { get; internal set; } = "";
+        public string Tag { get; internal set; } = "";
         public static readonly string[] NoTag = { "ANAL", "ANUS", "ARSE", "ASS", "BOOB", "BUM", "BUTT", "CAWK", "CIPA", "CLIT", "CNUT", "COCK", "COK", "COON", "COX", "CRAP", "CUM", "CUMS", "CUNT", "DAMN", "DICK", "DINK", "DLCK", "DYKE", "FAG", "FAGS", "FCUK", "FECK", "FOOK", "FUCK", "FUK", "FUKS", "FUX", "HELL", "HOAR", "HOER", "HOMO", "HORE", "JAP", "JISM", "JIZ", "JIZM", "JIZZ", "KAWK", "KNOB", "KOCK", "KUM", "KUMS", "LUST", "MOFO", "MUFF", "NAZI", "NOB", "PAWN", "PHUK", "PHUQ", "PISS", "POOP", "PORN", "PRON", "PUBE", "SEX", "SHAG", "SHIT", "SLUT", "SMUT", "SPAC", "TEEZ", "TIT", "TITS", "TITT", "TURD", "TWAT", "WANG", "WANK", "XXX", "DAGO", "DIKE", "GAY", "GOOK", "HEEB", "HO", "HOE", "KIKE", "KUNT", "KYKE", "MICK", "PAKI", "POON", "PUTO", "SHIZ", "SMEG", "SPIC", "TARD", "VAG", "WOP", "FOAH", "PUST", "SEKS", "SLAG", "ZUBB", "BBW", "BDSM", "DVDA", "GURO", "MILF", "NUDE", "ORGY", "POOF", "PTHC", "QUIM", "RAPE", "SCAT", "SEXO", "SEXY", "SUCK", "SMUT", "YURI", "YAOI", "XX", "XXX", "XXXX" };
         //public string announcement { get; internal set; } = "Test Announcement";
 
         public readonly List<NetworkID> joinRequest = new List<NetworkID>();         //People who has requested to join the empire but have not accepted / rejected
         public bool automaticRequest;
         
-        private Dictionary<NetworkID, Rank> members = new Dictionary<NetworkID, Rank>();
-        private Permissions[] permissions =
+        private readonly Dictionary<NetworkID, Rank> members = new Dictionary<NetworkID, Rank>();
+        private readonly Permissions[] permissions =
         {
             //Emperor
             Permissions.Chat /*| Permissions.OfficerChat*/ | Permissions.Invite | Permissions.Kick | Permissions.Ranks /* | Permissions.Announcement */ | Permissions.Disband,
@@ -88,7 +88,7 @@ namespace Imperium
         public static Empire GetEmpire(string name)
         {
             foreach(Empire empire in empires)
-                if(name.Equals(empire.name))
+                if(name.Equals(empire.Name))
                     return empire;
 
             return null;
@@ -113,7 +113,7 @@ namespace Imperium
             tag = tag.ToUpper().Trim();
 
             foreach (Empire empire in empires)
-                if (empire.tag.Equals(tag))
+                if (empire.Tag.Equals(tag))
                     return true;
             return false;
         }
@@ -167,7 +167,7 @@ namespace Imperium
 
         private Empire(string name, Players.Player emperor)
         {
-            this.name = name;
+            this.Name = name;
             members.Add(emperor.ID, Rank.Emperor);
             empires.Add(this);
         }
@@ -295,9 +295,9 @@ namespace Imperium
                 return false;
             }
 
-            this.name = char.ToUpper(name[0]) + name.Substring(1);
+            this.Name = char.ToUpper(name[0]) + name.Substring(1);
 
-            string message = string.Format("<color=yellow>{0} is the new name of the empire.</color>", this.name);
+            string message = string.Format("<color=yellow>{0} is the new name of the empire.</color>", this.Name);
             foreach(Players.Player plr in GetConnectedPlayers())
                 Chatting.Chat.Send(plr, message);
 
@@ -347,9 +347,9 @@ namespace Imperium
                 return false;
             }
 
-            this.tag = tag;
+            this.Tag = tag;
 
-            string message = string.Format("<color=yellow>{0} is the new tag of the empire.</color>", this.tag);
+            string message = string.Format("<color=yellow>{0} is the new tag of the empire.</color>", this.Tag);
             foreach (Players.Player plr in GetConnectedPlayers())
                 Chatting.Chat.Send(plr, message);
 
@@ -441,7 +441,7 @@ namespace Imperium
             }
 
             joinRequest.Add(player.ID);
-            Chatting.Chat.Send(player, string.Format("<color=green>You have requested to join to {0}.</color>", name));
+            Chatting.Chat.Send(player, string.Format("<color=green>You have requested to join to {0}.</color>", Name));
 
             foreach(Players.Player plr in GetConnectedPlayers())
                 Chatting.Chat.Send(plr, string.Format("<color=green>{0} has requested to join your empire. Only someone of sufficient rank can accept his request.</color>", player.Name));
@@ -450,9 +450,7 @@ namespace Imperium
         //Change the behaviour of this method
         public void Invite(Players.Player player, Players.Player causedBy)
         {
-            Rank rank = GetRank(causedBy);
-
-            if(!CanPermission(causedBy.ID, Permissions.Invite))
+            if (!CanPermission(causedBy.ID, Permissions.Invite))
             {
                 Chatting.Chat.Send(causedBy, "<color=orange>You do not have permission to invite.</color>");
                 return;
@@ -474,7 +472,7 @@ namespace Imperium
 
 
             members.Add(player.ID, Rank.Lord);
-            Chatting.Chat.Send(player, string.Format("<color=green>{0} has accepted your request of joining.</color>", name));
+            Chatting.Chat.Send(player, string.Format("<color=green>{0} has accepted your request of joining.</color>", Name));
 
             if (joinRequest.Contains(player.ID))
                 joinRequest.Remove(player.ID);
@@ -680,8 +678,8 @@ namespace Imperium
 
         public Empire(JSONNode json)
         {
-            name = json.GetAs<string>("Name");
-            tag = json.GetAsOrDefault<string>("Tag", "");
+            Name = json.GetAs<string>("Name");
+            Tag = json.GetAsOrDefault<string>("Tag", "");
 
             //announcement = json.GetAs<string>("Announcement");
             automaticRequest = json.GetAs<bool>("automaticRequest");
@@ -728,8 +726,8 @@ namespace Imperium
         public JSONNode SaveEmpire()
         {
             JSONNode json = new JSONNode();
-            json.SetAs<string>("Name", name);
-            json.SetAs<string>("Tag", tag);
+            json.SetAs<string>("Name", Name);
+            json.SetAs<string>("Tag", Tag);
             //json.SetAs<string>("Announcement", announcement);
             json.SetAs<bool>("automaticRequest", automaticRequest);
 

@@ -20,7 +20,7 @@ namespace Imperium
         {
             Empire empire = Empire.GetEmpire(causedBy);
 
-            if (AutomaticChat.activeTeamChat.Contains(causedBy) && empire != null)
+            if (AutomaticChat.ActiveTeamChat.Contains(causedBy) && empire != null)
             {
                 foreach (Players.Player plr in empire.GetConnectedPlayers())
                     Chatting.Chat.Send(plr, string.Format("<color=yellow>[{0}]</color>{1}> <color=yellow>{2}</color>", empire.GetRank(causedBy).ToString(), Name, Text));
@@ -28,9 +28,9 @@ namespace Imperium
                 return true;
             }
 
-            if(empire != null && !empire.tag.Equals(""))
+            if(empire != null && !empire.Tag.Equals(""))
             {
-                Prefix += "[<color=green>" + empire.tag + "</color>]";
+                Prefix += "[<color=green>" + empire.Tag + "</color>]";
 
                 Chatting.Chat.SendToConnected($"{Name}{Prefix}> {Text}");
 

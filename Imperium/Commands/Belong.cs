@@ -27,10 +27,8 @@ namespace Imperium.Commands
                 }
 
                 string targetPlayerName = m.Groups["targetplayername"].Value;
-                Players.Player targetPlayer;
-                string error;
 
-                if (!PlayerHelper.TryGetPlayer(targetPlayerName, out targetPlayer, out error, true))
+                if (!PlayerHelper.TryGetPlayer(targetPlayerName, out Players.Player targetPlayer, out string error, true))
                 {
                     Chatting.Chat.Send(player, $"Could not find '{targetPlayerName}'; {error}");
                     return true;
@@ -44,7 +42,7 @@ namespace Imperium.Commands
                 }
                 else
                 {
-                    Chatting.Chat.Send(player, $"'{targetPlayerName}' belong to '{empire.name}'.");
+                    Chatting.Chat.Send(player, $"'{targetPlayerName}' belong to '{empire.Name}'.");
                 }
             }
 

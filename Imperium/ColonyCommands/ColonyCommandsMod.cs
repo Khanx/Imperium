@@ -25,7 +25,7 @@ namespace Imperium.ColonyCommands
             }
         }
 
-        public static MethodInfo getMethodFromColonyCommandsMod(string _class, string _method)
+        public static MethodInfo GetMethodFromColonyCommandsMod(string _class, string _method)
         {
             if (colonyCommandsMod != null)
             {

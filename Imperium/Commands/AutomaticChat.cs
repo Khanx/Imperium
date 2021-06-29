@@ -7,7 +7,7 @@ namespace Imperium.Commands
     [ChatCommandAutoLoader]
     public class AutomaticChat : IChatCommand
     {
-        public static List<Players.Player> activeTeamChat { get; } = new List<Players.Player>();
+        public static List<Players.Player> ActiveTeamChat { get; } = new List<Players.Player>();
 
         public bool TryDoCommand(Players.Player player, string chat, List<string> splits)
         {
@@ -22,17 +22,17 @@ namespace Imperium.Commands
                     return true;
                 }
 
-                if(!activeTeamChat.Contains(player))
+                if(!ActiveTeamChat.Contains(player))
                 {
                     Chatting.Chat.Send(player, "<color=green>Activated the automatic chat empire.</color>");
-                    activeTeamChat.Add(player);
+                    ActiveTeamChat.Add(player);
 
                     return true;
                 }
                 else
                 {
                     Chatting.Chat.Send(player, "<color=green>Desactivated the automatic chat empire.</color>");
-                    activeTeamChat.Remove(player);
+                    ActiveTeamChat.Remove(player);
 
                     return true;
                 }
@@ -41,9 +41,9 @@ namespace Imperium.Commands
             if (chat.StartsWith("/"))
                 return false;
             
-            if (activeTeamChat.Contains(player) && empire == null)
+            if (ActiveTeamChat.Contains(player) && empire == null)
             {
-                activeTeamChat.Remove(player);
+                ActiveTeamChat.Remove(player);
 
                 return false;
             }
@@ -51,9 +51,9 @@ namespace Imperium.Commands
             if (ColonyCommands.ColonyCommandsMod.ColonyCommands)
                 return true;
 
-            if(!activeTeamChat.Contains(player) && empire != null && !empire.tag.Equals(""))
+            if(!ActiveTeamChat.Contains(player) && empire != null && !empire.Tag.Equals(""))
             {
-                Chatting.Chat.SendToConnected(string.Format("{0}[<color=green>{1}</color>]: {2}", player.Name, empire.tag, chat));
+                Chatting.Chat.SendToConnected(string.Format("{0}[<color=green>{1}</color>]: {2}", player.Name, empire.Tag, chat));
 
                 return true;
             }

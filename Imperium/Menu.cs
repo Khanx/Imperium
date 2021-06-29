@@ -22,8 +22,10 @@ namespace Imperium
             if (!belongEmpire)
                 menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_NewEmpire", new LabelData("Found a new empire", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
 
-            var table = new NetworkUI.Items.Table(550, 180);
-            table.ExternalMarginHorizontal = 0f;
+            NetworkUI.Items.Table table = new NetworkUI.Items.Table(550, 180)
+            {
+                ExternalMarginHorizontal = 0f
+            };
             {
                 var headerRow = new NetworkUI.Items.HorizontalRow(new List<(IItem, int)>()
                 {
@@ -40,11 +42,13 @@ namespace Imperium
 
             foreach (Empire empire in orderedEmpire)
             {
-                List<(IItem, int)> emp = new List<(IItem, int)>();
-                emp.Add((new NetworkUI.Items.Label(empire.name), 250));
+                List<(IItem, int)> emp = new List<(IItem, int)>
+                {
+                    (new NetworkUI.Items.Label(empire.Name), 250)
+                };
 
                 if (!belongEmpire && !empire.joinRequest.Contains(player.ID) && empire.GetPlayers().Count <= maxMembers)
-                    emp.Add((new NetworkUI.Items.ButtonCallback("Imperium_Apply", new LabelData("Apply", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "empire", empire.name } }), 150));
+                    emp.Add((new NetworkUI.Items.ButtonCallback("Imperium_Apply", new LabelData("Apply", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "empire", empire.Name } }), 150));
                 else
                     emp.Add((new NetworkUI.Items.ButtonCallback("Imperium_Apply", new LabelData("Apply", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), isInteractive: false), 150));
 
@@ -60,8 +64,6 @@ namespace Imperium
 
         public static void SendMenuFoundEmpire(Players.Player player)
         {
-            bool belongEmpire = null != Empire.GetEmpire(player);
-
             NetworkMenu menu = new NetworkMenu();
             menu.LocalStorage.SetAs("header", "Empires");
             menu.Width = 500;
@@ -90,12 +92,16 @@ namespace Imperium
             if (!empire.CanPermission(player.ID, Permissions.Invite))
                 return;
 
-            NetworkMenu menu = new NetworkMenu();
-            menu.Width = 550;
+            NetworkMenu menu = new NetworkMenu
+            {
+                Width = 550
+            };
             menu.LocalStorage.SetAs("header", "Join Request");
 
-            var table = new NetworkUI.Items.Table(550, 180);
-            table.ExternalMarginHorizontal = 0f;
+            NetworkUI.Items.Table table = new NetworkUI.Items.Table(550, 180)
+            {
+                ExternalMarginHorizontal = 0f
+            };
             {
                 var headerRow = new NetworkUI.Items.HorizontalRow(new List<(IItem, int)>()
                 {
@@ -145,10 +151,12 @@ namespace Imperium
                 return;
             }
 
-            NetworkMenu menu = new NetworkMenu();
-            menu.Width = 700;
-            menu.Height = 600;
-            menu.LocalStorage.SetAs("header", empire.name);
+            NetworkMenu menu = new NetworkMenu
+            {
+                Width = 700,
+                Height = 600
+            };
+            menu.LocalStorage.SetAs("header", empire.Name);
 
 
             /* K: ANNOUNCEMENT SYSTEM
@@ -174,17 +182,21 @@ namespace Imperium
             }
 
 
-            var table = new NetworkUI.Items.Table(700, 800);
-            table.ExternalMarginHorizontal = 0f;
+            NetworkUI.Items.Table table = new NetworkUI.Items.Table(700, 800)
             {
-                var headerRow = new NetworkUI.Items.HorizontalRow();
+                ExternalMarginHorizontal = 0f
+            };
+            {
+                NetworkUI.Items.HorizontalRow headerRow = new NetworkUI.Items.HorizontalRow
+                {
+                    Items = new List<(IItem, int)>
+                {
+                    (new NetworkUI.Items.Label("Name"), 250),
+                    (new NetworkUI.Items.Label("Rank"), 125)
+                }
+                };
 
-                headerRow.Items = new List<(IItem, int)>();
-
-                headerRow.Items.Add((new NetworkUI.Items.Label("Name"), 250));
-                headerRow.Items.Add((new NetworkUI.Items.Label("Rank"), 125));
-
-                if(ColonyCommands.ColonyCommandsMod.ColonyCommands)
+                if (ColonyCommands.ColonyCommandsMod.ColonyCommands)
                     headerRow.Items.Add((new NetworkUI.Items.Label("Last seen"), 125));
 
                 headerRow.Items.Add((new NetworkUI.Items.EmptySpace(), 125));
@@ -196,14 +208,15 @@ namespace Imperium
 
             foreach (Players.Player plr in empire.GetPlayersOrderedByRank())
             {
-                List<(IItem, int)> members = new List<(IItem, int)>();
-
-                members.Add((new NetworkUI.Items.Label(plr.Name), 250));
-                members.Add((new NetworkUI.Items.Label(empire.GetRank(plr).ToString()), 125));
+                List<(IItem, int)> members = new List<(IItem, int)>
+                {
+                    (new NetworkUI.Items.Label(plr.Name), 250),
+                    (new NetworkUI.Items.Label(empire.GetRank(plr).ToString()), 125)
+                };
 
                 if (ColonyCommands.ColonyCommandsMod.ColonyCommands)
                 {
-                    var m = ColonyCommands.ColonyCommandsMod.getMethodFromColonyCommandsMod("ActivityTracker", "GetLastSeen");
+                    var m = ColonyCommands.ColonyCommandsMod.GetMethodFromColonyCommandsMod("ActivityTracker", "GetLastSeen");
 
                     if (m != null)
                     {
@@ -234,9 +247,11 @@ namespace Imperium
 
         public static void SendMenuHelp(Players.Player player)
         {
-            NetworkMenu menu = new NetworkMenu();
-            menu.Width = 600;
-            menu.Height = 400;
+            NetworkMenu menu = new NetworkMenu
+            {
+                Width = 600,
+                Height = 400
+            };
             menu.LocalStorage.SetAs("header", "HELP");
 
             menu.Items.Add(new NetworkUI.Items.Label(new LabelData("Commands", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter, 45)));
@@ -286,9 +301,11 @@ namespace Imperium
             Rank p1_rank = empire.GetRank(player);
             Rank p2_rank = empire.GetRank(player2);
 
-            NetworkMenu menu = new NetworkMenu();
-            menu.Width = 400;
-            menu.LocalStorage.SetAs("header", empire.name);
+            NetworkMenu menu = new NetworkMenu
+            {
+                Width = 400
+            };
+            menu.LocalStorage.SetAs("header", empire.Name);
 
             menu.Items.Add(new NetworkUI.Items.Label("Name: " + player2.Name));
             string rank = "Rank:";
@@ -357,11 +374,11 @@ namespace Imperium
             menu.Width = 500;
 
             menu.Items.Add(new NetworkUI.Items.Label("Empire Name"));
-            menu.LocalStorage.SetAs("EmpireName", empire.name);
+            menu.LocalStorage.SetAs("EmpireName", empire.Name);
             menu.Items.Add(new NetworkUI.Items.InputField("EmpireName"));
 
             menu.Items.Add(new NetworkUI.Items.Label("Empire Tag"));
-            menu.LocalStorage.SetAs("EmpireTag", empire.tag);
+            menu.LocalStorage.SetAs("EmpireTag", empire.Tag);
             menu.Items.Add(new NetworkUI.Items.InputField("EmpireTag"));
 
             menu.LocalStorage.SetAs("AutomaticRequest", empire.automaticRequest);
@@ -425,8 +442,6 @@ namespace Imperium
                 menu.LocalStorage.SetAs(((Permissions)i).ToString(), empire.CanPermission((Rank)rank, (Permissions)i));
             }
 
-            List<IItem> buttons = new List<IItem>();
-
             menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_SetPermission", new LabelData("Save", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "rank", rank } }));
             menu.Items.Add(new NetworkUI.Items.ButtonCallback("Imperium_BackPermission", new LabelData("Back", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter)));
 
@@ -439,8 +454,10 @@ namespace Imperium
             menu.LocalStorage.SetAs("header", "Empire belong");
             menu.Width = 700;
 
-            var table = new NetworkUI.Items.Table(700, 180);
-            table.ExternalMarginHorizontal = 0f;
+            NetworkUI.Items.Table table = new NetworkUI.Items.Table(700, 180)
+            {
+                ExternalMarginHorizontal = 0f
+            };
             {
                 var headerRow = new NetworkUI.Items.HorizontalRow(new List<(IItem, int)>()
                 {
@@ -457,15 +474,16 @@ namespace Imperium
             {
                 Players.Player plr = Players.GetConnectedByIndex(i);
 
-                List<(IItem, int)> emp = new List<(IItem, int)>();
-
-                emp.Add((new NetworkUI.Items.Label(plr.Name), 250));
+                List<(IItem, int)> emp = new List<(IItem, int)>
+                {
+                    (new NetworkUI.Items.Label(plr.Name), 250)
+                };
 
                 Empire empire = Empire.GetEmpire(plr);
 
                 if (empire != null)
                 {
-                    emp.Add((new NetworkUI.Items.Label(empire.name), 250));
+                    emp.Add((new NetworkUI.Items.Label(empire.Name), 250));
                     emp.Add((new NetworkUI.Items.Label(empire.GetRank(plr).ToString()), 250));
                 }
                 else
@@ -489,8 +507,10 @@ namespace Imperium
             menu.Width = 550;
             menu.Height = 600;
 
-            var table = new NetworkUI.Items.Table(550, 180);
-            table.ExternalMarginHorizontal = 0f;
+            NetworkUI.Items.Table table = new NetworkUI.Items.Table(550, 180)
+            {
+                ExternalMarginHorizontal = 0f
+            };
             {
                 var headerRow = new NetworkUI.Items.HorizontalRow(new List<(IItem, int)>()
                 {
@@ -506,10 +526,12 @@ namespace Imperium
 
             foreach (Empire empire in orderedEmpire)
             {
-                List<(IItem, int)> emp = new List<(IItem, int)>();
-                emp.Add((new NetworkUI.Items.Label(empire.name), 250));
+                List<(IItem, int)> emp = new List<(IItem, int)>
+                {
+                    (new NetworkUI.Items.Label(empire.Name), 250),
 
-                emp.Add((new NetworkUI.Items.ButtonCallback("Imperium_ManageAsEmperor", new LabelData("Manage as Emperor", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup, ButtonPayload: new JObject() { { "empire", empire.name } }), 250));
+                    (new NetworkUI.Items.ButtonCallback("Imperium_ManageAsEmperor", new LabelData("Manage as Emperor", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), onClickActions: NetworkUI.Items.ButtonCallback.EOnClickActions.ClosePopup, ButtonPayload: new JObject() { { "empire", empire.Name } }), 250)
+                };
 
                 table.Rows.Add(new NetworkUI.Items.HorizontalRow(emp));
             }
@@ -544,7 +566,7 @@ namespace Imperium
         [ModLoader.ModCallback(ModLoader.EModCallbackType.OnPlayerPushedNetworkUIButton, "Khanx.Imperium.PressButton")]
         public static void EmpireButtonManager(ButtonPressCallbackData data)
         {
-            Empire empire = null;
+            Empire empire;
             Players.Player plr;
 
             switch (data.ButtonIdentifier)
@@ -587,7 +609,7 @@ namespace Imperium
                         else
                         {
                             empire.joinRequest.Remove(plr.ID);
-                            Chatting.Chat.Send(plr, string.Format("<color=green>{0} has rejected your request of joining.</color>", empire.name));
+                            Chatting.Chat.Send(plr, string.Format("<color=green>{0} has rejected your request of joining.</color>", empire.Name));
                         }
 
                     if (empire.joinRequest.Count > 0)
@@ -680,11 +702,11 @@ namespace Imperium
                     if (null != empire)
                     {
                         string newName = data.Storage.GetAs<string>("EmpireName");
-                        if (!empire.name.Equals(newName))
+                        if (!empire.Name.Equals(newName))
                             empire.SetEmpireName(newName, data.Player);
 
                         string newTag = data.Storage.GetAs<string>("EmpireTag");
-                        if (!empire.tag.Equals(newTag))
+                        if (!empire.Tag.Equals(newTag))
                             empire.SetEmpireTag(newTag, data.Player);
 
                         bool automaticRequest = data.Storage.GetAs<bool>("AutomaticRequest");
