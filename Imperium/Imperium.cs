@@ -28,7 +28,7 @@ namespace Imperium
                 return true;
             }
 
-            if(empire != null && !empire.Tag.Equals(""))
+            if (empire != null && !empire.Tag.Equals(""))
             {
                 Prefix += "[<color=green>" + empire.Tag + "</color>]";
 

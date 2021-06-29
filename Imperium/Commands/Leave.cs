@@ -13,7 +13,7 @@ namespace Imperium.Commands
 
             Empire empire = Empire.GetEmpire(player);
 
-            if(null == empire)
+            if (null == empire)
             {
                 Chatting.Chat.Send(player, "<color=orange>You do not belong to any empire.</color>");
                 return true;

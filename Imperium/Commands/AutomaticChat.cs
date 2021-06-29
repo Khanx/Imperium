@@ -13,16 +13,16 @@ namespace Imperium.Commands
         {
             Empire empire = Empire.GetEmpire(player);
 
-            if(chat.Equals("/chat_empire", StringComparison.OrdinalIgnoreCase))
+            if (chat.Equals("/chat_empire", StringComparison.OrdinalIgnoreCase))
             {
-                if(empire == null)
+                if (empire == null)
                 {
                     Chatting.Chat.Send(player, "<color=orange>You do not belong to any empire.</color>");
 
                     return true;
                 }
 
-                if(!ActiveTeamChat.Contains(player))
+                if (!ActiveTeamChat.Contains(player))
                 {
                     Chatting.Chat.Send(player, "<color=green>Activated the automatic chat empire.</color>");
                     ActiveTeamChat.Add(player);
@@ -37,27 +37,27 @@ namespace Imperium.Commands
                     return true;
                 }
             }
-            
+
             if (chat.StartsWith("/"))
                 return false;
-            
+
             if (ActiveTeamChat.Contains(player) && empire == null)
             {
                 ActiveTeamChat.Remove(player);
 
                 return false;
             }
-            
+
             if (ColonyCommands.ColonyCommandsMod.ColonyCommands)
                 return true;
 
-            if(!ActiveTeamChat.Contains(player) && empire != null && !empire.Tag.Equals(""))
+            if (!ActiveTeamChat.Contains(player) && empire != null && !empire.Tag.Equals(""))
             {
                 Chatting.Chat.SendToConnected(string.Format("{0}[<color=green>{1}</color>]: {2}", player.Name, empire.Tag, chat));
 
                 return true;
             }
-            
+
             foreach (Players.Player plr in empire.GetConnectedPlayers())
                 Chatting.Chat.Send(plr, string.Format("<color=yellow>[{0}][{1}]: {2}</color>", empire.GetRank(player).ToString(), player.Name, chat));
 

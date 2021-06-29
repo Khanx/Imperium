@@ -36,7 +36,7 @@ namespace Imperium.Commands
 
                 Empire empire = Empire.GetEmpire(targetPlayer);
 
-                if(empire == null)
+                if (empire == null)
                 {
                     Chatting.Chat.Send(player, $"'{targetPlayerName}' does not belong to any empire.");
                 }

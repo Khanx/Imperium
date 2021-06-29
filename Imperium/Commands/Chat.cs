@@ -13,7 +13,7 @@ namespace Imperium.Commands
 
             Empire empire = Empire.GetEmpire(player);
 
-            if(null == empire)
+            if (null == empire)
             {
                 Chatting.Chat.Send(player, "<color=orange>You do not belong to any empire.</color>");
 
@@ -22,7 +22,7 @@ namespace Imperium.Commands
 
             string name = player.Name;
 
-            foreach(Players.Player plr in empire.GetConnectedPlayers())
+            foreach (Players.Player plr in empire.GetConnectedPlayers())
                 Chatting.Chat.Send(plr, string.Format("<color=yellow>[{0}][{1}]: {2}</color>", empire.GetRank(player).ToString(), name, chat.Substring(4)));
 
             return true;
