@@ -128,10 +128,10 @@ namespace Imperium
 
                 requests.Add((new NetworkUI.Items.Label(plr.Name), 250));
                 if (empire.GetPlayers().Count < maxMembers)
-                    requests.Add((new NetworkUI.Items.ButtonCallback("Imperium_Request", new LabelData("Accept", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "accept", true }, { "player", player.ID.ToString() } }), 125));
+                    requests.Add((new NetworkUI.Items.ButtonCallback("Imperium_Request", new LabelData("Accept", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "accept", true }, { "player", plr.ID.ToString() } }), 125));
                 else
                     requests.Add((new NetworkUI.Items.ButtonCallback("Imperium_Request", new LabelData("Accept", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), isInteractive: false), 125));
-                requests.Add((new NetworkUI.Items.ButtonCallback("Imperium_Request", new LabelData("Reject", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "accept", false }, { "player", player.ID.ToString() } }), 125));
+                requests.Add((new NetworkUI.Items.ButtonCallback("Imperium_Request", new LabelData("Reject", UnityEngine.Color.white, UnityEngine.TextAnchor.MiddleCenter), ButtonPayload: new JObject() { { "accept", false }, { "player", plr.ID.ToString() } }), 125));
 
                 table.Rows.Add(new NetworkUI.Items.HorizontalRow(requests));
             }
@@ -601,7 +601,7 @@ namespace Imperium
                         return;
 
                     if (Players.TryGetPlayer(NetworkID.Parse(data.ButtonPayload.Value<string>("player")), out plr))
-
+                    {
                         if (data.ButtonPayload.Value<bool>("accept"))
                         {
                             empire.Invite(plr, data.Player);
@@ -611,6 +611,7 @@ namespace Imperium
                             empire.joinRequest.Remove(plr.ID);
                             Chatting.Chat.Send(plr, string.Format("<color=green>{0} has rejected your request of joining.</color>", empire.Name));
                         }
+                    }
 
                     if (empire.joinRequest.Count > 0)
                         SendMenuEmpireRequest(data.Player);
