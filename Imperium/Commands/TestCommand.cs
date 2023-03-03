@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Imperium.Commands
 {
+    /*
     [ChatCommandAutoLoader]
     public class TestCommand : IChatCommand
     {
@@ -20,7 +21,7 @@ namespace Imperium.Commands
             else
                 Chatting.Chat.SendToConnected("Method not found");
 
-            string lastseen = (string)m.Invoke(null, new object[] { player.ID.ToStringReadable() });
+            string lastseen = (string)m.Invoke(null, new object[] { player.ID.ID.ToStringReadable() });
 
             if (!lastseen.Equals("never"))
                 lastseen = lastseen.Substring(0, lastseen.IndexOf(" ")).Trim();
@@ -30,4 +31,5 @@ namespace Imperium.Commands
             return true;
         }
     }
+    */
 }

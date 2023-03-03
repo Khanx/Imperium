@@ -58,8 +58,15 @@ namespace Imperium.Commands
                 return true;
             }
 
+            if (!ActiveTeamChat.Contains(player))
+            {
+                Chatting.Chat.SendToConnected(string.Format("{0}: {2}", player.Name, chat));
+
+                return true;
+            }
+
             foreach (Players.Player plr in empire.GetConnectedPlayers())
-                Chatting.Chat.Send(plr, string.Format("<color=yellow>[{0}][{1}]: {2}</color>", empire.GetRank(player).ToString(), player.Name, chat));
+            Chatting.Chat.Send(plr, string.Format("<color=yellow>[{0}][{1}]: {2}</color>", empire.GetRank(player).ToString(), player.Name, chat));
 
             return true;
         }

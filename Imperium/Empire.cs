@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Pipliz;
-using Pipliz.JSON;
 
+using Newtonsoft;
+using Newtonsoft.Json;
+
+using ExtensionMethods;
 
 namespace Imperium
 {
@@ -37,12 +40,12 @@ namespace Imperium
     /*
     public struct Member
     {
-        public NetworkID networkID;
+        public Players.PlayerIDShort playerID;
         public Rank rank;
 
-        public Member(NetworkID networkID, Rank rank)
+        public Member(Players.PlayerIDShort playerID, Rank rank)
         {
-            this.networkID = networkID;
+            this.playerID = playerID;
             this.rank = rank;
         }
 
@@ -51,7 +54,7 @@ namespace Imperium
             if(!( obj is Member ))
                 return false;
 
-            return ( (Member)obj ).networkID == networkID;
+            return ( (Member)obj ).playerID == playerID;
         }
     }
     */
@@ -60,16 +63,16 @@ namespace Imperium
     {
         public static List<Empire> empires = new List<Empire>();
 
-        public string Name { get; internal set; } = "";
-        public string Tag { get; internal set; } = "";
+        public string Name { get; set; } = "";
+        public string Tag { get; set; } = "";
         public static readonly string[] NoTag = { "ANAL", "ANUS", "ARSE", "ASS", "BOOB", "BUM", "BUTT", "CAWK", "CIPA", "CLIT", "CNUT", "COCK", "COK", "COON", "COX", "CRAP", "CUM", "CUMS", "CUNT", "DAMN", "DICK", "DINK", "DLCK", "DYKE", "FAG", "FAGS", "FCUK", "FECK", "FOOK", "FUCK", "FUK", "FUKS", "FUX", "HELL", "HOAR", "HOER", "HOMO", "HORE", "JAP", "JISM", "JIZ", "JIZM", "JIZZ", "KAWK", "KNOB", "KOCK", "KUM", "KUMS", "LUST", "MOFO", "MUFF", "NAZI", "NOB", "PAWN", "PHUK", "PHUQ", "PISS", "POOP", "PORN", "PRON", "PUBE", "SEX", "SHAG", "SHIT", "SLUT", "SMUT", "SPAC", "TEEZ", "TIT", "TITS", "TITT", "TURD", "TWAT", "WANG", "WANK", "XXX", "DAGO", "DIKE", "GAY", "GOOK", "HEEB", "HO", "HOE", "KIKE", "KUNT", "KYKE", "MICK", "PAKI", "POON", "PUTO", "SHIZ", "SMEG", "SPIC", "TARD", "VAG", "WOP", "FOAH", "PUST", "SEKS", "SLAG", "ZUBB", "BBW", "BDSM", "DVDA", "GURO", "MILF", "NUDE", "ORGY", "POOF", "PTHC", "QUIM", "RAPE", "SCAT", "SEXO", "SEXY", "SUCK", "SMUT", "YURI", "YAOI", "XX", "XXX", "XXXX" };
         //public string announcement { get; internal set; } = "Test Announcement";
 
-        public readonly List<NetworkID> joinRequest = new List<NetworkID>();         //People who has requested to join the empire but have not accepted / rejected
+        public readonly List<int> joinRequest = new List<int>();         //People who has requested to join the empire but have not accepted / rejected
         public bool automaticRequest;
 
-        private readonly Dictionary<NetworkID, Rank> members = new Dictionary<NetworkID, Rank>();
-        private readonly Permissions[] permissions =
+        public readonly Dictionary<int, Rank> members = new Dictionary<int, Rank>();
+        public readonly Permissions[] permissions =
         {
             //Emperor
             Permissions.Chat /*| Permissions.OfficerChat*/ | Permissions.Invite | Permissions.Kick | Permissions.Ranks /* | Permissions.Announcement */ | Permissions.Disband,
@@ -85,6 +88,16 @@ namespace Imperium
             Permissions.Chat,
         };
 
+        public Empire(string name, string tag, List<int> joinRequest, bool automaticRequest, Dictionary<int, Rank> members, Permissions[] permissions)
+        {
+            Name = name;
+            Tag = tag;
+            this.joinRequest = joinRequest;
+            this.automaticRequest = automaticRequest;
+            this.members = members;
+            this.permissions = permissions;
+        }
+
         public static Empire GetEmpire(string name)
         {
             foreach (Empire empire in empires)
@@ -97,7 +110,7 @@ namespace Imperium
         public static Empire GetEmpire(Players.Player player)
         {
             foreach (Empire empire in empires)
-                if (empire.members.ContainsKey(player.ID))
+                if (empire.members.ContainsKey(player.ID.ID.ID))
                     return empire;
 
             return null;
@@ -159,7 +172,7 @@ namespace Imperium
 
             Empire empire = GetEmpire(emperor);
 
-            if (!empire.SetEmpireTag(tag, emperor))
+            if (tag == null || !empire.SetEmpireTag(tag, emperor))
                 Chatting.Chat.Send(emperor, "<color=orange>You can set the tag of your empire in the settings of your empire.</color>");
 
             return true;
@@ -168,13 +181,13 @@ namespace Imperium
         private Empire(string name, Players.Player emperor)
         {
             this.Name = name;
-            members.Add(emperor.ID, Rank.Emperor);
+            members.Add(emperor.ID.ID.ID, Rank.Emperor);
             empires.Add(this);
         }
 
         public void Disband(Players.Player player)
         {
-            if (!members.ContainsKey(player.ID))
+            if (!members.ContainsKey(player.ID.ID.ID))
             {
                 Chatting.Chat.Send(player, "<color=orange>You do not belong to any empire.</color>");
                 return;
@@ -191,7 +204,7 @@ namespace Imperium
             foreach (Players.Player plr in GetPlayers())
             {
                 Chatting.Chat.Send(player, message);
-                members.Remove(plr.ID);
+                members.Remove(plr.ID.ID.ID);
             }
 
             empires.Remove(this);
@@ -201,9 +214,9 @@ namespace Imperium
         {
             List<Players.Player> players = new List<Players.Player>();
 
-            foreach (NetworkID networkID in members.Keys)
+            foreach (int playerID in members.Keys)
             {
-                Players.Player player = Players.GetPlayer(networkID);
+                Players.Player player = Extender.GetPlayerByID(new Players.PlayerIDShort(playerID));
                 if (null != player)
                     players.Add(player);
             }
@@ -215,9 +228,9 @@ namespace Imperium
         {
             List<Players.Player> players = new List<Players.Player>();
 
-            foreach (NetworkID networkID in members.Keys)
+            foreach (int playerID in members.Keys)
             {
-                Players.Player player = Players.GetPlayer(networkID);
+                Players.Player player = Extender.GetPlayerByID(new Players.PlayerIDShort(playerID));
                 if (null != player && player.ConnectionState == Players.EConnectionState.Connected)
                     players.Add(player);
             }
@@ -232,11 +245,11 @@ namespace Imperium
             for (int i = 0; i < help.Length; i++)
                 help[i] = new List<Players.Player>();
 
-            foreach (NetworkID networkID in members.Keys)
+            foreach (int playerID in members.Keys)
             {
-                Players.Player player = Players.GetPlayer(networkID);
+                Players.Player player = Extender.GetPlayerByID(new Players.PlayerIDShort(playerID));
                 if (null != player)
-                    help[(int)members[networkID]].Add(player);
+                    help[(int)members[playerID]].Add(player);
             }
 
             List<Players.Player> players = new List<Players.Player>();
@@ -252,10 +265,10 @@ namespace Imperium
 
         public Rank GetRank(Players.Player player)
         {
-            return GetRank(player.ID);
+            return GetRank(player.ID.ID.ID);
         }
 
-        public Rank GetRank(NetworkID playerID)
+        public Rank GetRank(int playerID)
         {
             if (members.ContainsKey(playerID))
                 return members[playerID];
@@ -268,14 +281,14 @@ namespace Imperium
             return (permissions[(int)rank] & permission) == permission;
         }
 
-        public bool CanPermission(NetworkID playerID, Permissions permission)
+        public bool CanPermission(int playerID, Permissions permission)
         {
             return CanPermission(GetRank(playerID), permission);
         }
 
         public bool SetEmpireName(string name, Players.Player player)
         {
-            if (!members.ContainsKey(player.ID))
+            if (!members.ContainsKey(player.ID.ID.ID))
             {
                 Chatting.Chat.Send(player, "<color=orange>You do not belong to any empire.</color>");
                 return false;
@@ -309,7 +322,7 @@ namespace Imperium
             if (tag.Equals(""))
                 return false;
 
-            if (!members.ContainsKey(player.ID))
+            if (!members.ContainsKey(player.ID.ID.ID))
             {
                 Chatting.Chat.Send(player, "<color=orange>You do not belong to any empire.</color>");
                 return false;
@@ -359,7 +372,7 @@ namespace Imperium
         /* K: ANNOUNCEMENT SYSTEM
         public void SetAnnouncement(string announcement, Players.Player player)
         {
-            if(!members.ContainsKey(player.ID))
+            if(!members.ContainsKey(player.ID.ID.ID))
             {
                 Chatting.Chat.Send(player, "<color=orange>You do not belong to any empire.</color>");
                 return;
@@ -393,7 +406,7 @@ namespace Imperium
             {
                 foreach (var request in joinRequest)
                 {
-                    if (Players.TryGetPlayer(request, out Players.Player requester))
+                    if (Players.TryGetPlayer(new Players.PlayerIDShort(request), out Players.Player requester))
                     {
                         Invite(requester);
                         joinRequest.Remove(request);
@@ -404,7 +417,7 @@ namespace Imperium
 
         public void SetPermissions(Players.Player player, Rank rank, Permissions permission)
         {
-            if (!members.ContainsKey(player.ID))
+            if (!members.ContainsKey(player.ID.ID.ID))
             {
                 Chatting.Chat.Send(player, "<color=orange>You do not belong to any empire.</color>");
                 return;
@@ -428,7 +441,7 @@ namespace Imperium
                 return;
             }
 
-            if (joinRequest.Contains(player.ID))
+            if (joinRequest.Contains(player.ID.ID.ID))
             {
                 Chatting.Chat.Send(player, "<color=orange>You have already requested to join this empire. Wait until they accept / reject your request to request joining again.</color>");
                 return;
@@ -440,7 +453,7 @@ namespace Imperium
                 return;
             }
 
-            joinRequest.Add(player.ID);
+            joinRequest.Add(player.ID.ID.ID);
             Chatting.Chat.Send(player, string.Format("<color=green>You have requested to join to {0}.</color>", Name));
 
             foreach (Players.Player plr in GetConnectedPlayers())
@@ -450,7 +463,7 @@ namespace Imperium
         //Change the behaviour of this method
         public void Invite(Players.Player player, Players.Player causedBy)
         {
-            if (!CanPermission(causedBy.ID, Permissions.Invite))
+            if (!CanPermission(causedBy.ID.ID.ID, Permissions.Invite))
             {
                 Chatting.Chat.Send(causedBy, "<color=orange>You do not have permission to invite.</color>");
                 return;
@@ -460,8 +473,8 @@ namespace Imperium
             {
                 Chatting.Chat.Send(causedBy, string.Format("<color=orange>{0} already belongs to an Empire.</color>", player.Name));
 
-                if (joinRequest.Contains(player.ID))
-                    joinRequest.Remove(player.ID);
+                if (joinRequest.Contains(player.ID.ID.ID))
+                    joinRequest.Remove(player.ID.ID.ID);
 
                 return;
             }
@@ -471,11 +484,11 @@ namespace Imperium
                 Chatting.Chat.Send(plr, message);
 
 
-            members.Add(player.ID, Rank.Lord);
+            members.Add(player.ID.ID.ID, Rank.Lord);
             Chatting.Chat.Send(player, string.Format("<color=green>{0} has accepted your request of joining.</color>", Name));
 
-            if (joinRequest.Contains(player.ID))
-                joinRequest.Remove(player.ID);
+            if (joinRequest.Contains(player.ID.ID.ID))
+                joinRequest.Remove(player.ID.ID.ID);
         }
 
         public void Invite(Players.Player player)
@@ -484,16 +497,16 @@ namespace Imperium
             {
                 Chatting.Chat.Send(player, "<color=orange>You already belongs to an Empire.</color>");
 
-                if (joinRequest.Contains(player.ID))
-                    joinRequest.Remove(player.ID);
+                if (joinRequest.Contains(player.ID.ID.ID))
+                    joinRequest.Remove(player.ID.ID.ID);
 
                 return;
             }
 
-            if (joinRequest.Contains(player.ID))
-                joinRequest.Remove(player.ID);
+            if (joinRequest.Contains(player.ID.ID.ID))
+                joinRequest.Remove(player.ID.ID.ID);
 
-            members.Add(player.ID, Rank.Lord);
+            members.Add(player.ID.ID.ID, Rank.Lord);
 
             string message = string.Format("<color=orange>{0} has joined join the Empire</color>", player.Name);
             foreach (Players.Player plr in GetConnectedPlayers())
@@ -502,7 +515,7 @@ namespace Imperium
 
         public void Quit(Players.Player player)
         {
-            if (!members.ContainsKey(player.ID))
+            if (!members.ContainsKey(player.ID.ID.ID))
             {
                 Chatting.Chat.Send(player, "<color=orange>You do not belong to any empire.</color>");
                 return;
@@ -516,7 +529,7 @@ namespace Imperium
             }
             */
 
-            members.Remove(player.ID);
+            members.Remove(player.ID.ID.ID);
             Chatting.Chat.Send(player, "<color=orange>You has left the empire.</color>");
 
             string message = string.Format("<color=orange>{0} has defected.</color>", player.Name);
@@ -526,19 +539,19 @@ namespace Imperium
 
         public void Kick(Players.Player player, Players.Player causedBy)
         {
-            if (!members.ContainsKey(causedBy.ID))
+            if (!members.ContainsKey(causedBy.ID.ID.ID))
             {
                 Chatting.Chat.Send(causedBy, "<color=orange>You do not belong to any empire.</color>");
                 return;
             }
 
-            if (!CanPermission(causedBy.ID, Permissions.Kick))
+            if (!CanPermission(causedBy.ID.ID.ID, Permissions.Kick))
             {
                 Chatting.Chat.Send(causedBy, "<color=orange>You do not have permission to kick.</color>");
                 return;
             }
 
-            if (!members.ContainsKey(player.ID))
+            if (!members.ContainsKey(player.ID.ID.ID))
             {
                 Chatting.Chat.Send(causedBy, string.Format("<color=orange>{0} does not belongs to your empire.</color>", player.Name));
                 return;
@@ -554,7 +567,7 @@ namespace Imperium
             }
 
             Chatting.Chat.Send(player, "<color=orange>You have been kicked of the empire.</color>");
-            members.Remove(player.ID);
+            members.Remove(player.ID.ID.ID);
 
             //Notify ALL the players of the empire
             string message = string.Format("<color=orange>{0} has been kicked by {1}</color>", player.Name, causedBy.Name);
@@ -565,19 +578,19 @@ namespace Imperium
 
         public void Promote(Players.Player player, Players.Player causedBy)
         {
-            if (!members.ContainsKey(causedBy.ID))
+            if (!members.ContainsKey(causedBy.ID.ID.ID))
             {
                 Chatting.Chat.Send(causedBy, "<color=orange>You do not belong to any empire.</color>");
                 return;
             }
 
-            if (!CanPermission(causedBy.ID, Permissions.Ranks))
+            if (!CanPermission(causedBy.ID.ID.ID, Permissions.Ranks))
             {
                 Chatting.Chat.Send(causedBy, "<color=orange>You do not have permission to promote / demote.</color>");
                 return;
             }
 
-            if (!members.ContainsKey(player.ID))
+            if (!members.ContainsKey(player.ID.ID.ID))
             {
                 Chatting.Chat.Send(causedBy, string.Format("<color=orange>{0} does not belongs to your empire.</color>", player.Name));
                 return;
@@ -595,7 +608,7 @@ namespace Imperium
             /* With this ENABLED there is only ONE emperor
             if(rankCausedBy == Rank.Emperor && rankPlayer == Rank.Duke)
             {
-                members[player.ID] = Rank.Emperor;
+                members[player.ID.ID.ID] = Rank.Emperor;
                 members[causedBy.ID] = Rank.Duke;
 
                 string message = string.Format("<color=yellow>{0} is the new emperor of the empire.</color>", player.Name);
@@ -604,15 +617,15 @@ namespace Imperium
                 return;
             }*/
 
-            members[player.ID] = rankPlayer - 1;
-            string message2 = string.Format("<color=orange>{0} has been promoted to {1}.</color>", player.Name, members[player.ID].ToString());
+            members[player.ID.ID.ID] = rankPlayer - 1;
+            string message2 = string.Format("<color=orange>{0} has been promoted to {1}.</color>", player.Name, members[player.ID.ID.ID].ToString());
             foreach (Players.Player plr in GetConnectedPlayers())
                 Chatting.Chat.Send(plr, message2);
         }
 
         public void Demote(Players.Player player, Players.Player causedBy)
         {
-            if (!members.ContainsKey(causedBy.ID))
+            if (!members.ContainsKey(causedBy.ID.ID.ID))
             {
                 Chatting.Chat.Send(causedBy, "<color=orange>You do not belong to any empire.</color>");
                 return;
@@ -620,13 +633,13 @@ namespace Imperium
 
             Rank rankCausedBy = GetRank(causedBy);
 
-            if (!CanPermission(causedBy.ID, Permissions.Ranks))
+            if (!CanPermission(causedBy.ID.ID.ID, Permissions.Ranks))
             {
                 Chatting.Chat.Send(causedBy, "<color=orange>You do not have permission to promote / demote.</color>");
                 return;
             }
 
-            if (!members.ContainsKey(player.ID))
+            if (!members.ContainsKey(player.ID.ID.ID))
             {
                 Chatting.Chat.Send(causedBy, string.Format("<color=orange>{0} does not belongs to your empire.</color>", player.Name));
                 return;
@@ -646,8 +659,8 @@ namespace Imperium
                 return;
             }
 
-            members[player.ID] = rankPlayer + 1;
-            string message2 = string.Format("<color=orange>{0} has been demoted to {1}.</color>", player.Name, members[player.ID].ToString());
+            members[player.ID.ID.ID] = rankPlayer + 1;
+            string message2 = string.Format("<color=orange>{0} has been demoted to {1}.</color>", player.Name, members[player.ID.ID.ID].ToString());
             foreach (Players.Player plr in GetConnectedPlayers())
                 Chatting.Chat.Send(plr, message2);
         }
@@ -667,15 +680,16 @@ namespace Imperium
                 return;
             }
 
-            members.Add(player.ID, Rank.Emperor);
+            members.Add(player.ID.ID.ID, Rank.Emperor);
         }
 
         //Staff management
         public void SetRank(Players.Player player, Rank rank)
         {
-            members[player.ID] = rank;
+            members[player.ID.ID.ID] = rank;
         }
 
+        /*
         public Empire(JSONNode json)
         {
             Name = json.GetAs<string>("Name");
@@ -692,7 +706,7 @@ namespace Imperium
             //Load members
             foreach (var member in json.GetAs<JSONNode>("Members").LoopArray())
             {
-                NetworkID nID = NetworkID.Parse(member.GetAs<string>("ID"));
+                Players.PlayerID nID = Players.PlayerIDShort.Parse(member.GetAs<string>("ID"));
                 Rank rank = (Rank)Enum.Parse(typeof(Rank), member.GetAs<string>("Rank"));
 
                 members.Add(nID, rank);
@@ -701,12 +715,13 @@ namespace Imperium
             //Load Request
             foreach (var requests in json.GetAs<JSONNode>("Requests").LoopArray())
             {
-                NetworkID nID = NetworkID.Parse(requests.GetAs<string>());
+                Players.PlayerIDShort nID = Players.PlayerIDShort.Parse(requests.GetAs<string>());
                 joinRequest.Add(nID);
             }
 
             empires.Add(this);
         }
+        */
 
         [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterWorldLoad, "Khanx.Imperium.LoadEmpires")]
         public static void LoadEmpires()
@@ -717,47 +732,7 @@ namespace Imperium
             if (!File.Exists(jsonFilePath))
                 return;
 
-            JSONNode json = JSON.Deserialize(jsonFilePath);
-
-            foreach (JSONNode empire in json.LoopArray())
-                new Empire(empire);
-        }
-
-        public JSONNode SaveEmpire()
-        {
-            JSONNode json = new JSONNode();
-            json.SetAs<string>("Name", Name);
-            json.SetAs<string>("Tag", Tag);
-            //json.SetAs<string>("Announcement", announcement);
-            json.SetAs<bool>("automaticRequest", automaticRequest);
-
-            JSONNode permissionsjson = new JSONNode(NodeType.Array);
-
-            foreach (var permission in permissions)
-                permissionsjson.AddToArray(new JSONNode(permission.ToString()));
-
-            json.SetAs("Permissions", permissionsjson);
-
-            JSONNode membersjson = new JSONNode(NodeType.Array);
-            foreach (var member in members.Keys)
-            {
-                JSONNode memberjson = new JSONNode();
-                memberjson.SetAs<string>("ID", member.ToString());
-                memberjson.SetAs<string>("Rank", members[member].ToString());
-
-                membersjson.AddToArray(memberjson);
-            }
-
-            json.SetAs("Members", membersjson);
-
-            JSONNode requestjson = new JSONNode(NodeType.Array);
-
-            foreach (var request in joinRequest)
-                requestjson.AddToArray(new JSONNode(request.ToString()));
-
-            json.SetAs("Requests", requestjson);
-
-            return json;
+            empires = JsonConvert.DeserializeObject<List<Empire>>(File.ReadAllText(jsonFilePath));
         }
 
         [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAutoSaveWorld, "Khanx.Imperium.SaveOnAutoSave")]
@@ -773,12 +748,9 @@ namespace Imperium
             if (empires.Count == 0)
                 return;
 
-            JSONNode json = new JSONNode(NodeType.Array);
+            string json = JsonConvert.SerializeObject(empires, Formatting.Indented);
 
-            foreach (Empire emp in empires)
-                json.AddToArray(emp.SaveEmpire());
-
-            JSON.Serialize(jsonFilePath, json);
+            File.WriteAllText(jsonFilePath, json);
         }
     }
 }

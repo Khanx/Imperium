@@ -4,6 +4,7 @@ using System.Reflection;
 
 namespace Imperium.ColonyCommands
 {
+    
     [ModLoader.ModManager]
     public static class ColonyCommandsMod
     {
