@@ -82,6 +82,7 @@
     <Compile Include="Commands\Leave.cs" />
     <Compile Include="Empire.cs" />
     <Compile Include="Menu.cs" />
+    <Compile Include="PlayerCD.cs" />
     <Compile Include="PlayerHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

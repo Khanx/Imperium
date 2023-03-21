@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Pipliz;
-
-using Newtonsoft;
 using Newtonsoft.Json;
 
 using ExtensionMethods;
@@ -521,13 +519,11 @@ namespace Imperium
                 return;
             }
 
-            /*
             if(Rank.Emperor == GetRank(player))
             {
-                Chatting.Chat.Send(player, "<color=orange>The emperor can not leave the empire without designating a new emperor.</color>");
+                Chatting.Chat.Send(player, "<color=orange>An emperor cannot abandon his empire. You can either designate another emperor and have him demote you or disband the empire.</color>");
                 return;
             }
-            */
 
             members.Remove(player.ID.ID.ID);
             Chatting.Chat.Send(player, "<color=orange>You has left the empire.</color>");

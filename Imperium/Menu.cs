@@ -198,10 +198,8 @@ namespace Imperium
                 }
                 };
 
-                /*
                 if (ColonyCommands.ColonyCommandsMod.ColonyCommands)
                     headerRow.Items.Add((new NetworkUI.Items.Label("Last seen"), 125));
-                */
 
                 headerRow.Items.Add((new NetworkUI.Items.EmptySpace(), 125));
 
