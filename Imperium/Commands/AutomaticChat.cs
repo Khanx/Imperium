@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Chatting;
+using colonyserver.Assets.UIGeneration;
+using Pipliz;
 
 namespace Imperium.Commands
 {
@@ -27,12 +29,17 @@ namespace Imperium.Commands
                     Chatting.Chat.Send(player, "<color=green>Activated the automatic chat empire.</color>");
                     ActiveTeamChat.Add(player);
 
+                    UIManager.AddorUpdateUILabel("Empire_Chat", colonyshared.NetworkUI.UIGeneration.UIElementDisplayType.Global, "Empire chat enabled",
+                            new Vector3Int(100, 50, 0), colonyshared.NetworkUI.AnchorPresets.BottomLeft, 150, player, color: "#ffff00");
+
                     return true;
                 }
                 else
                 {
                     Chatting.Chat.Send(player, "<color=green>Desactivated the automatic chat empire.</color>");
                     ActiveTeamChat.Remove(player);
+
+                    UIManager.RemoveUILabel("Empire_Chat", player);
 
                     return true;
                 }
@@ -44,6 +51,7 @@ namespace Imperium.Commands
             if (ActiveTeamChat.Contains(player) && empire == null)
             {
                 ActiveTeamChat.Remove(player);
+                UIManager.RemoveUILabel("Empire_Chat", player);
 
                 return false;
             }
