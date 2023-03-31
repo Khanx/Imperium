@@ -10,7 +10,7 @@ namespace Imperium
     [ModLoader.ModManager]
     public static class EmpireMenu
     {
-        public static readonly int maxMembers = 20;
+        public static readonly int maxMembers = 15;
 
         public static void SendMenuEmpireList(Players.Player player)
         {
